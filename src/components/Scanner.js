@@ -54,7 +54,7 @@ class Scanner extends Component {
   }
 
   render() {
-    return (<div id="interactive" className="viewport"/>)
+    return (<div id="interactive" className="viewport" style={{ width: '100%' }}/>)
   }
 }
 

@@ -8,12 +8,22 @@ function getProduct(db, upc) {
   return db.product.where({ upc }).toArray()
 }
 
-function getInventoryCounts(db, inventoryId) {
-  return db.inventoryCount.where({ inventoryId }).toArray()
+function getInventoryCounts(db, inventoryId, filter) {
+  let collection = db.inventoryCount.where({ inventoryId })
+
+  if (filter === 'even') {
+    collection = collection.and((item) => { return item.manualQty === item.reportQty })
+  } else if (filter === 'over') {
+    collection = collection.and((item) => { return parseInt(item.manualQty.toString(), 10) > parseInt(item.reportQty.toString(), 10) })
+  } else if (filter === 'under') {
+    collection = collection.and((item) => { return parseInt(item.manualQty.toString(), 10) < parseInt(item.reportQty.toString(), 10) })
+  }
+
+  return collection.toArray()
 }
 
-function getInventoryCount(db, upc) {
-  return db.inventoryCount.where({ upc }).toArray()
+function getInventoryCount(db, upc, inventoryId) {
+  return db.inventoryCount.where({ upc, inventoryId }).toArray()
 }
 
 class LocalIndexedDB {
@@ -43,30 +53,59 @@ class LocalIndexedDB {
     return this.db.inventory.where({ status: 'active' }).toArray()
   }
 
+  updateCount(key, changes) {
+    return this.db.inventoryCount.update(key, changes)
+  }
+
+  async getAllInventories() {
+    const inventories = await this.db.inventory.toArray()
+    const inventoriesWithCounts = await Promise.all(inventories.map(async (inventory) => {
+      const { startDate, id } = inventory
+      let overCount = 0
+      let underCount = 0
+
+      const productsAndCounts = await this.getInventoryProductsAndCounts(inventory.id)
+
+      productsAndCounts.forEach((product) => {
+        const { manualQty, reportQty } = product
+        if (manualQty > reportQty) {
+          overCount++
+        } else if (reportQty > manualQty) {
+          underCount++
+        }
+      })
+
+      return {
+        id,
+        startDate,
+        overCount,
+        underCount
+      }
+    }))
+
+    return inventoriesWithCounts
+  }
+
   insertProducts(products) {
     return this.db.product.bulkPut(products)
   }
 
-  getProductAndCountByUPC(upc) {
-    return getProduct(this.db, upc).then((product) => {
-      return getInventoryCount(this.db, upc).then((inventoryCount) => {
-        return {
-          product,
-          inventoryCount
-        }
-      })
-    })
+  async getProductAndCountByUPC(upc, inventoryId) {
+    const product = await getProduct(this.db, upc)
+    const inventoryCount = await getInventoryCount(this.db, upc, inventoryId)
+    return {
+      product,
+      inventoryCount
+    }
   }
 
-  getInventoryProductsAndCounts(inventoryId) {
-    return getProducts(this.db).then((products) => {
-      return getInventoryCounts(this.db, inventoryId).then((inventoryCounts) => {
-        return products.map((product) => {
-          return Object.assign({}, product, inventoryCounts.find((ic) => {
-            return (product.upc === ic.upc)
-          }))
-        })
-      })
+  async getInventoryProductsAndCounts(inventoryId, filter = 'all') {
+    const products = await getProducts(this.db)
+    const inventoryCounts = await getInventoryCounts(this.db, inventoryId, filter)
+    return inventoryCounts.map((ic) => {
+      return Object.assign({}, ic, products.find((product) => {
+        return (product.upc === ic.upc)
+      }))
     })
   }
 

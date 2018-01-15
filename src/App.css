@@ -4,3 +4,36 @@
 .react-grid-Container {
   font-size: 12px;
 }
+
+.padded {
+  padding: 20px;
+}
+
+.fade-enter {
+  opacity: 0;
+  z-index: 1;
+}
+
+.fade-enter.fade-enter-active {
+  opacity: 1;
+  transition: opacity 250ms ease-in;
+}
+
+.bottom-nav a {
+  text-align: center;
+  width: 100%;
+}
+
+.bottom-nav a button {
+  width:calc(100% - 5px)
+}
+
+.viewport video {
+  width: 100%;
+  height: 310.5px;
+}
+
+.scanner-container {
+  height: 310.5px;
+  background-color: black;
+}
