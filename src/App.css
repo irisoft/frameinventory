@@ -1,6 +1,3 @@
-.App {
-}
-
 .react-grid-Container {
   font-size: 12px;
 }
@@ -14,7 +11,7 @@
   z-index: 1;
 }
 
-.fade-enter.fade-enter-active {
+.fade-enter-active {
   opacity: 1;
   transition: opacity 250ms ease-in;
 }
@@ -29,11 +26,15 @@
 }
 
 .viewport video {
-  width: 100%;
   height: 310.5px;
+  width: 100%;
 }
 
 .scanner-container {
-  height: 310.5px;
   background-color: black;
+  height: 310.5px;
+}
+
+canvas.drawingBuffer {
+  display: none;
 }

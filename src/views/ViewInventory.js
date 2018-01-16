@@ -34,9 +34,6 @@ class ViewInventory extends Component {
     this.fetchData = this.fetchData.bind(this)
     this.columns = [
       { key: 'upc', name: 'UPC', sortable: true },
-      // { key: 'type', name: 'Type', sortable: true, width: 175 },
-      // { key: 'brand', name: 'Brand', sortable: true, width: 175 },
-      // { key: 'description', name: 'Description', sortable: true },
       { key: 'reportQty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right' },
       { key: 'manualQty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true }
     ]

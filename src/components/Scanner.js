@@ -17,7 +17,7 @@ class Scanner extends Component {
         constraints: {
           width: 640,
           height: 480,
-          facing: "environment" // or user
+          facingMode: "environment" // or user
         }
       },
       locator: {
@@ -27,13 +27,7 @@ class Scanner extends Component {
       numOfWorkers: 2,
       decoder: {
         readers : [ "upc_reader" ],
-        multiple: false,
-        debug: {
-          drawBoundingBox: true,
-          showFrequency: true,
-          drawScanline: true,
-          showPattern: true
-        }
+        multiple: false
       },
       locate: true
     }, function(err) {

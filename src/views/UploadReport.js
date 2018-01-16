@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import PropTypes from 'prop-types'
-import { Button, Input } from 'reactstrap'
+// import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
+import { Navbar, Nav, Button } from 'reactstrap'
 import XLSX from 'xlsx'
 import DataAdapter from '../dataAdapters/LocalIndexedDB'
 
@@ -81,19 +82,28 @@ class UploadReport extends Component {
   render() {
     const { inventoryId, readyToRedirect, file } = this.state
 
-    return !readyToRedirect ?
-    (
+    return !readyToRedirect
+    ? (
       <div>
         <div className="padded">
-
           <form onSubmit={this.onFormSubmit}>
             <input accept=".xlsx" className="btn btn-secondary btn-block" type="file" onChange={this.onChange} name="file" id="exampleFile" />
             <br />
             {file && <input className="btn btn-primary btn-block" type="submit" value="Upload" />}
           </form>
         </div>
+        <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
+          <Nav className="bottom-nav">
+            <Link to={`/`}>
+              <Button color="secondary" size="md">Cancel</Button>
+            </Link>
+          </Nav>
+        </Navbar>
       </div>
-    ) : <Redirect to={`/inventory/${inventoryId}`} />
+    )
+    : (
+      <Redirect to={`/inventory/${inventoryId}`} />
+    )
   }
 }
 

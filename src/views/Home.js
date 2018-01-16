@@ -21,10 +21,6 @@ class Home extends Component {
     this.setState({ inventories: await this.dataAdapter.getAllInventories() })
   }
 
-  componentDidUpdate(prevProps, prevState) {
-
-  }
-
   render() {
     const { inventories } = this.state
     const inventoriesItems = inventories.map((inventory) => {

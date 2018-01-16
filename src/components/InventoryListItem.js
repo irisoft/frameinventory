@@ -9,7 +9,6 @@ function InventoryListItem({ id, title, description, overCount, underCount }) {
 
   return (
     <Link to={`/inventory/${id}`} >
-
       <ListGroupItem className="justify-content-between">
         {title}
         <div>

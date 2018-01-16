@@ -1,14 +1,14 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+// import PropTypes from 'prop-types'
 import Quagga from 'quagga'
 import Scanner from '../components/Scanner'
-import Result from '../components/Result'
 import DataAdapter from '../dataAdapters/LocalIndexedDB'
 import { Link } from 'react-router-dom'
 import { Navbar, Nav, Button } from 'reactstrap'
 import Beep from  'browser-beep'
 
 const beep = Beep({ frequency: 830 })
-const boop = Beep({ frequency: 415 })
+const boop = Beep({ frequency: 315 })
 
 class Scan extends Component {
   constructor(props) {
@@ -25,14 +25,6 @@ class Scan extends Component {
   componentDidMount() {
     this.setState({ scanReady: true });
   }
-
-  // componentDidUpdate(prevProps, prevState) {
-  //
-  // }
-
-  // handleScan = () => {
-  //   this.setState({scanning: !scanning});
-  // }
 
   validateItem = (item) => {
     if (!(typeof item === 'object')) return false
@@ -63,8 +55,7 @@ class Scan extends Component {
     if (isValid) {
       beep(1)
       this.setState({ scannedItem: productAndCount }, async () => {
-        const updatedCount = await this.dataAdapter.updateCount([ inventoryId, productAndCount.product[0].upc ], { manualQty: (productAndCount.inventoryCount[0].manualQty + 1) })
-        console.log(`updated ${updatedCount} records`, [ inventoryId, productAndCount.product[0].upc ])
+        await this.dataAdapter.updateCount([ inventoryId, productAndCount.product[0].upc ], { manualQty: (productAndCount.inventoryCount[0].manualQty + 1) })
         productAndCount = await this.dataAdapter.getProductAndCountByUPC(result.codeResult.code, inventoryId)
         this.setState({ scannedItem: productAndCount })
       })
@@ -107,7 +98,7 @@ class Scan extends Component {
           {scanning ? <Scanner onDetected={this.handleDetected}/> : null}
         </div>
         <div className="padded">
-          { scannedItem && (
+          { scannedItem ? (
             <div className="container">
               <div className="row text">
                 <div className="col-6">
@@ -134,16 +125,13 @@ class Scan extends Component {
                 </div>
               </div>
             </div>
-          )}
+          ) : (<i className="text-center" style={{ display: 'block' }}>Scan a barcode to get started.</i>)}
         </div>
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/inventory/${inventoryId}`}>
               <Button color="secondary" size="md">Back</Button>
             </Link>
-            {/* <a>
-              <Button color="primary" size="md" onClick={this.handleScan}>{scanning ? 'Stop' : 'Start'}</Button>
-            </a> */}
           </Nav>
         </Navbar>
       </div>
