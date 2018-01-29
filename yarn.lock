@@ -51,9 +51,9 @@ address@1.0.3, address@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/address/-/address-1.0.3.tgz#b5f50631f8d6cec8bd20c963963afb55e06cbce9"
 
-adler-32@~1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/adler-32/-/adler-32-1.1.0.tgz#03551a5c7f0edfbd4fc8fa12a6814978eab651c3"
+adler-32@~1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/adler-32/-/adler-32-1.2.0.tgz#6a3e6bf0a63900ba15652808cb15c6813d1a5f25"
   dependencies:
     exit-on-epipe "~1.0.1"
     printj "~1.1.0"
@@ -1087,9 +1087,9 @@ brorand@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/brorand/-/brorand-1.1.0.tgz#12c25efe40a45e3c323eb8675a0a0ce57b22371f"
 
-browser-beep@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/browser-beep/-/browser-beep-1.0.1.tgz#e8ba0e003d9c38605eb8063485de7b0d1e565094"
+browser-beep@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/browser-beep/-/browser-beep-1.0.2.tgz#591cc3609d660bf97441919255a01fbadf0809cb"
 
 browser-resolve@^1.11.2:
   version "1.11.2"
@@ -1283,12 +1283,12 @@ center-align@^0.1.1:
     align-text "^0.1.3"
     lazy-cache "^1.0.3"
 
-cfb@~1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/cfb/-/cfb-1.0.1.tgz#557bb24f67dae78803785a1595d365bc82c5fab4"
+cfb@~1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/cfb/-/cfb-1.0.2.tgz#f51d9bbe5b5d1e75700581d68222f2ef46ec2142"
   dependencies:
     commander "^2.12.1"
-    printj "~1.1.0"
+    printj "~1.1.1"
 
 chain-function@^1.0.0:
   version "1.0.0"
@@ -1410,9 +1410,9 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
 
-codepage@~1.11.0:
-  version "1.11.0"
-  resolved "https://registry.yarnpkg.com/codepage/-/codepage-1.11.0.tgz#1076095b9f03b5ca04f43873fa1a627742285de2"
+codepage@~1.12.0:
+  version "1.12.0"
+  resolved "https://registry.yarnpkg.com/codepage/-/codepage-1.12.0.tgz#9c95f5729f8d775ecc7d9819098a7fb239beeeaf"
   dependencies:
     commander "~2.11.0"
     exit-on-epipe "~1.0.1"
@@ -1467,6 +1467,10 @@ commander@2.12.x, commander@^2.12.1, commander@~2.12.1:
 commander@~2.11.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
+
+commander@~2.13.0:
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-2.13.0.tgz#6964bca67685df7c1f1430c584f07d7597885b9c"
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -1586,9 +1590,9 @@ cosmiconfig@^2.1.0, cosmiconfig@^2.1.1:
     parse-json "^2.2.0"
     require-from-string "^1.1.0"
 
-crc-32@~1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/crc-32/-/crc-32-1.1.1.tgz#5d739d5e4c6e352ad8304d73223d483fe55adb8d"
+crc-32@~1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/crc-32/-/crc-32-1.2.0.tgz#cb2db6e29b88508e32d9dd0ec1693e7b41a18208"
   dependencies:
     exit-on-epipe "~1.0.1"
     printj "~1.1.0"
@@ -3807,8 +3811,8 @@ jpeg-js@^0.1.1:
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.1.2.tgz#135b992c0575c985cfa0f494a3227ed238583ece"
 
 jquery@>=1.9.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
 js-base64@^2.1.9:
   version "2.4.0"
@@ -5134,6 +5138,10 @@ printj@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/printj/-/printj-1.1.0.tgz#85487b5e8f96763b0b4a253613bef9dd9b387e3c"
 
+printj@~1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/printj/-/printj-1.1.1.tgz#3749360215888d460a35b683ae13dcc02c620b47"
+
 private@^0.1.6, private@^0.1.7:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/private/-/private-0.1.8.tgz#2381edb3689f7a53d653190060fcf822d2f368ff"
@@ -5298,9 +5306,9 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-data-grid@^2.0.78:
-  version "2.0.78"
-  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.78.tgz#f9dde48a804d19da28916ef7daa09a58abe633c6"
+react-data-grid@^3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-3.0.8.tgz#e5125d5695c5bfbb0b4af3494661a5f1dff3b66d"
 
 react-dev-utils@^4.2.1:
   version "4.2.1"
@@ -5339,8 +5347,8 @@ react-error-overlay@^3.0.0:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
 
 react-popper@^0.7.2:
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-0.7.4.tgz#8649d539837e7c6f47bc9b24c9cf57a404e199a1"
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-0.7.5.tgz#71c25946f291db381231281f6b95729e8b801596"
   dependencies:
     popper.js "^1.12.5"
     prop-types "^15.5.10"
@@ -6800,15 +6808,15 @@ xdg-basedir@^2.0.0:
   dependencies:
     os-homedir "^1.0.0"
 
-xlsx@^0.11.14:
-  version "0.11.14"
-  resolved "https://registry.yarnpkg.com/xlsx/-/xlsx-0.11.14.tgz#bf9d84479c2f1486c331a80f2cb9c198da0dc85e"
+xlsx@^0.11.18:
+  version "0.11.18"
+  resolved "https://registry.yarnpkg.com/xlsx/-/xlsx-0.11.18.tgz#36320107ccee1bc96b702c1aac2a004edb22c3d8"
   dependencies:
-    adler-32 "~1.1.0"
-    cfb "~1.0.1"
-    codepage "~1.11.0"
-    commander "~2.11.0"
-    crc-32 "~1.1.1"
+    adler-32 "~1.2.0"
+    cfb "~1.0.2"
+    codepage "~1.12.0"
+    commander "~2.13.0"
+    crc-32 "~1.2.0"
     exit-on-epipe "~1.0.1"
     ssf "~0.10.1"
 

@@ -130,7 +130,7 @@ class Scan extends Component {
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/inventory/${inventoryId}`}>
-              <Button color="secondary" size="md">Back</Button>
+              <Button color="secondary" size="md"><i className="fas fa-th-list"></i> Back to List</Button>
             </Link>
           </Nav>
         </Navbar>

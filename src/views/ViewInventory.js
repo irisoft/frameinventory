@@ -3,13 +3,13 @@ import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import DataAdapter from '../dataAdapters/LocalIndexedDB'
 import { Link } from 'react-router-dom'
-import { Navbar, Nav, Button } from 'reactstrap'
+import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
 
-const FilterButton = ({ color, size, children, filterValue, onClick }) => {
+const FilterButton = ({ color, active, size, children, filterValue, onClick }) => {
   return (
-    <a>
       <Button
-        color={color}
+        // color={color}
+        active={active}
         size={size}
         onClick={() => {
           if (typeof onClick === 'function') {
@@ -19,7 +19,6 @@ const FilterButton = ({ color, size, children, filterValue, onClick }) => {
       >
         {children}
       </Button>
-    </a>
   )
 }
 
@@ -28,7 +27,9 @@ class ViewInventory extends Component {
     super(props)
     this.state = {
       inventoryProductsAndCounts: [],
-      filter: 'all'
+      filter: 'all',
+      gridHeight: 1000,
+      el: null
     }
     this.dataAdapter = new DataAdapter()
     this.fetchData = this.fetchData.bind(this)
@@ -97,17 +98,35 @@ class ViewInventory extends Component {
     this.setState({ filter })
   }
 
+  captureEl = (el) => {
+    this.setState({ el }, () => {
+      this.measureHeight(el)
+      el.addEventListener('resize', () => {
+        this.measureHeight(el)
+      })
+    })
+  }
+
+  measureHeight = (el) => {
+    if (el) {
+      // console.log('height', el.offsetHeight, el.clientHeight, el.scrollHeight)
+      this.setState({ gridHeight: parseInt(el.offsetHeight.toString(), 10) - 43 - 54 })
+    }
+  }
+
   render() {
-    const { inventoryProductsAndCounts } = this.state
+    const { inventoryProductsAndCounts, filter, gridHeight } = this.state
     const { match: { params: { inventoryId } } } = this.props
     return (
-      <div>
+      <div className="max-height" ref={this.measureHeight}>
         <Navbar light color="inverse" className="justify-content-between">
           <Nav className="bottom-nav">
-            <FilterButton color="secondary" size="sm" onClick={this.handleFilter} filterValue="all">All</FilterButton>
-            <FilterButton color="warning" size="sm" onClick={this.handleFilter} filterValue="over">Over</FilterButton>
-            <FilterButton color="danger" size="sm" onClick={this.handleFilter} filterValue="under">Under</FilterButton>
-            <FilterButton color="success" size="sm" onClick={this.handleFilter} filterValue="even">Even</FilterButton>
+            <ButtonGroup>
+              <FilterButton color="secondary" size="sm" active={filter === 'all'} onClick={this.handleFilter} filterValue="all">All</FilterButton>
+              <FilterButton color="warning" size="sm" active={filter === 'over'} onClick={this.handleFilter} filterValue="over">Over</FilterButton>
+              <FilterButton color="danger" size="sm" active={filter === 'under'} onClick={this.handleFilter} filterValue="under">Under</FilterButton>
+              <FilterButton color="success" size="sm" active={filter === 'even'} onClick={this.handleFilter} filterValue="even">Even</FilterButton>
+            </ButtonGroup>
           </Nav>
         </Navbar>
         {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
@@ -115,7 +134,7 @@ class ViewInventory extends Component {
             columns={this.columns}
             rowGetter={this.rowGetter}
             rowsCount={inventoryProductsAndCounts.length}
-            minHeight={500}
+            minHeight={gridHeight}
             onGridSort={this.handleGridSort}
             enableCellSelect={true}
             onGridRowsUpdated={this.handleGridRowsUpdated}
@@ -125,13 +144,13 @@ class ViewInventory extends Component {
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to="/">
-              <Button color="secondary" size="md">Back</Button>
+              <Button color="secondary" size="md"><i className="fas fa-home"></i> Home</Button>
             </Link>
             <Link to={`/scan/${inventoryId}`}>
-              <Button color="primary" size="md">Scan</Button>
+              <Button color="primary" size="md"><i className="fas fa-barcode"></i> Scan</Button>
             </Link>
             <Link to="/">
-              <Button color="success" size="md">Finalize</Button>
+              <Button color="success" size="md"><i className="fas fa-check-square"></i> Done</Button>
             </Link>
           </Nav>
         </Navbar>

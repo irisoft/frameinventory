@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Button, ListGroup } from 'reactstrap'
+import { Navbar, Nav, Button, ListGroup } from 'reactstrap'
 import InventoryListItem from '../components/InventoryListItem'
 import DataAdapter from '../dataAdapters/LocalIndexedDB'
 import { Link } from 'react-router-dom'
@@ -42,12 +42,18 @@ class Home extends Component {
     })
     return (
       <div>
-        <div className="padded">
-          <Link to="/upload"><Button block color="primary">Start New</Button></Link>
-        </div>
         <ListGroup>
           {inventoriesItems}
         </ListGroup>
+        <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
+          <Nav className="bottom-nav">
+            <Link to="/upload">
+              <Button block color="success">
+                <i class="fas fa-upload"></i>&nbsp; Upload New Report
+              </Button>
+            </Link>
+          </Nav>
+        </Navbar>
       </div>
     )
   }

@@ -95,7 +95,7 @@ class UploadReport extends Component {
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/`}>
-              <Button color="secondary" size="md">Cancel</Button>
+              <Button color="danger" size="md"><i class="fas fa-times-circle"></i> Cancel</Button>
             </Link>
           </Nav>
         </Navbar>

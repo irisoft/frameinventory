@@ -5,6 +5,7 @@ import Home from './views/Home'
 import ViewInventory from './views/ViewInventory'
 import Scan from './views/Scan'
 import UploadReport from './views/UploadReport'
+import logo from './assets/company-logo-white.png'
 import './App.css'
 
 class App extends Component {
@@ -16,11 +17,17 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div>
+        <div className="max-height">
           <Navbar light color="inverse" fixed="top" className="justify-content-between">
-            <NavbarBrand><span className="text-white">Inventory</span></NavbarBrand>
+            <NavbarBrand>
+              <div className="d-flex align-items-center">
+                <img alt="Irisoft Logo" height={18} src={logo} />
+                &nbsp;&nbsp;
+                <span className="text-white">Inventory</span>
+              </div>
+            </NavbarBrand>
           </Navbar>
-          
+
           <Route exact path="/" component={Home} />
           <Route path="/upload" component={UploadReport} />
           <Route path="/inventory/:inventoryId" component={ViewInventory} />
@@ -32,3 +39,9 @@ class App extends Component {
 }
 
 export default App;
+
+
+// green #8dc600
+// blue  #007494
+// red   #EF476F
+// orang #FFD166

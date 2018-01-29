@@ -38,3 +38,43 @@
 canvas.drawingBuffer {
   display: none;
 }
+
+.btn-success {
+  color: #fff;
+  background-color: #8dc600;
+  border-color: #8dc600;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007494;
+  border-color: #007494;
+}
+
+.btn-warning {
+  color: #fff;
+  background-color: #FFD166;
+  border-color: #FFD166;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #EF476F;
+  border-color: #EF476F;
+}
+
+.btn-group {
+  width: 100%;
+}
+
+.btn-group .btn {
+  width: 100%;
+}
+
+.react-grid-Row--even div {
+  background-color: #f8f8f8;
+}
+
+.max-height {
+  height: fill-available;
+}
