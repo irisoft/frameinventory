@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
-import DataAdapter from '../dataAdapters/LocalIndexedDB'
+import DataAdapter from '../dataAdapters/JsonApi'
 import { Link } from 'react-router-dom'
 import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
 

@@ -45,18 +45,22 @@ class LocalIndexedDB {
     })
   }
 
+  /**/
   createNewInventory() {
     return this.db.inventory.put({ startDate: new Date(), status: 'active' })
   }
 
+  /**/
   getActiveInventory() {
     return this.db.inventory.where({ status: 'active' }).toArray()
   }
 
+  /**/
   updateCount(key, changes) {
     return this.db.inventoryCount.update(key, changes)
   }
 
+  /**/
   async getAllInventories() {
     const inventories = await this.db.inventory.toArray()
     const inventoriesWithCounts = await Promise.all(inventories.map(async (inventory) => {
@@ -86,10 +90,12 @@ class LocalIndexedDB {
     return inventoriesWithCounts
   }
 
+  /**/
   insertProducts(products) {
     return this.db.product.bulkPut(products)
   }
 
+  /**/
   async getProductAndCountByUPC(upc, inventoryId) {
     const product = await getProduct(this.db, upc)
     const inventoryCount = await getInventoryCount(this.db, upc, inventoryId)
@@ -99,6 +105,7 @@ class LocalIndexedDB {
     }
   }
 
+  /**/
   async getInventoryProductsAndCounts(inventoryId, filter = 'all') {
     const products = await getProducts(this.db)
     const inventoryCounts = await getInventoryCounts(this.db, inventoryId, filter)
@@ -109,6 +116,7 @@ class LocalIndexedDB {
     })
   }
 
+  /**/
   insertInventoryCounts(inventoryCounts) {
     return this.db.inventoryCount.bulkPut(inventoryCounts)
   }

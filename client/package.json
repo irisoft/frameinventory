@@ -6,6 +6,7 @@
     "bootstrap": "4.0.0-alpha.6",
     "browser-beep": "^1.0.2",
     "dexie": "^2.0.1",
+    "node-rest-client": "^3.1.0",
     "prop-types": "^15.6.0",
     "quagga": "^0.12.1",
     "react": "^16.2.0",

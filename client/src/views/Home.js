@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Navbar, Nav, Button, ListGroup } from 'reactstrap'
 import InventoryListItem from '../components/InventoryListItem'
-import DataAdapter from '../dataAdapters/LocalIndexedDB'
+import DataAdapter from '../dataAdapters/JsonApi'
 import { Link } from 'react-router-dom'
 
 class Home extends Component {
@@ -23,18 +23,24 @@ class Home extends Component {
 
   render() {
     const { inventories } = this.state
-    const inventoriesItems = inventories.map((inventory) => {
+    const inventoriesItems = Array.isArray(inventories) && inventories.map((inventory) => {
+
+      console.log('i', inventory)
+
       const {
         id,
-        startDate,
+        start_date,
         underCount,
         overCount
       } = inventory
+
+      const startDate = new Date(Date.parse(start_date)).toDateString()
+
       return (
         <InventoryListItem
           key={id}
           id={id}
-          title={startDate.toDateString()}
+          title={startDate}
           underCount={underCount}
           overCount={overCount}
         />
@@ -49,7 +55,7 @@ class Home extends Component {
           <Nav className="bottom-nav">
             <Link to="/upload">
               <Button block color="success">
-                <i class="fas fa-upload"></i>&nbsp; Upload New Report
+                <i className="fas fa-upload"></i>&nbsp; Upload New Report
               </Button>
             </Link>
           </Nav>
