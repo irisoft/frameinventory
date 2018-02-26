@@ -22,7 +22,7 @@ function Product(server, db) {
         text: `
           INSERT INTO
             product (
-              organizationId,
+              organization_id,
               upc,
               brand,
               description,

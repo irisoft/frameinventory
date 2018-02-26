@@ -35,8 +35,8 @@ class ViewInventory extends Component {
     this.fetchData = this.fetchData.bind(this)
     this.columns = [
       { key: 'upc', name: 'UPC', sortable: true },
-      { key: 'reportQty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right' },
-      { key: 'manualQty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true }
+      { key: 'report_qty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right' },
+      { key: 'manual_qty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true }
     ]
   }
 
@@ -82,13 +82,13 @@ class ViewInventory extends Component {
   handleGridRowsUpdated = async ({ fromRow, toRow, updated }) => {
     const inventoryProductsAndCounts = this.state.inventoryProductsAndCounts.slice()
 
-    if (typeof updated === 'object' && typeof updated.manualQty === 'string') {
-      updated.manualQty = parseInt(updated.manualQty, 10)
+    if (typeof updated === 'object' && typeof updated.manual_qty === 'string') {
+      updated.manual_qty = parseInt(updated.manual_qty, 10)
     }
 
     for (let i = fromRow; i <= toRow; i++) {
-      let { inventoryId, upc } = inventoryProductsAndCounts[i]
-      this.dataAdapter.updateCount([ inventoryId, upc ], updated)
+      let { inventory_id, upc } = inventoryProductsAndCounts[i]
+      await this.dataAdapter.updateCount(upc, inventory_id, updated.manual_qty)
     }
 
     this.fetchData()

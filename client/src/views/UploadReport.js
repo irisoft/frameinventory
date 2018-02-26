@@ -44,7 +44,7 @@ class UploadReport extends Component {
 
       const json = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1'])
 
-      this.dataAdapter.createNewInventory().then((inventoryId) => {
+      this.dataAdapter.createNewInventory().then( async ({ id: inventoryId }) => {
         const products = []
 
         json.forEach((row) => {
@@ -55,14 +55,13 @@ class UploadReport extends Component {
             type: row['Product Type'],
             salesPrices: row['Sales Price'],
             sellinPrice: row['Sell-in Price'],
-            inventoryId,
             reportQty: parseInt(row['Quantity'].toString(), 10),
             manualQty: 0
           }
           products.push(product)
         })
 
-        this.dataAdapter.insertProducts(products)
+        await this.dataAdapter.insertProducts(inventoryId, products)
         this.setState({ readyToRedirect: true, inventoryId })
       })
     }

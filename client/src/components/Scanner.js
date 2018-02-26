@@ -26,7 +26,7 @@ class Scanner extends Component {
       },
       numOfWorkers: 2,
       decoder: {
-        readers : [ "upc_reader" ],
+        readers : [ "ean_reader", "code_128_reader" ],
         multiple: false
       },
       locate: true

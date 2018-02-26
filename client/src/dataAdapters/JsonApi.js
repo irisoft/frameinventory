@@ -1,97 +1,106 @@
-import NRC from 'node-rest-client'
+import request from 'request-json'
 
-const ROOT_PATH = 'http://localhost:8080'
-const client = new NRC.Client()
+const client = request.createClient('http://localhost:8080')
 
-/* INVENTORY METHODS */
+const apiMethods = {
 
-client.registerMethod(
-  'getInventory',
-  `${ROOT_PATH}/organization/\${organizationId}/inventory`,
-  'GET'
-)
+  /* INVENTORY METHODS */
 
-client.registerMethod(
-  'createInventory',
-  `${ROOT_PATH}/organization/\${organizationId}/inventory`,
-  'POST'
-)
+  getInventory: ({ organizationId }) => (
+    {
+      path: `/organization/${organizationId}/inventory`,
+      method: 'get'
+    }
+  ),
 
-client.registerMethod(
-  'getProductAndCountByUPC',
-  `${ROOT_PATH}/organization/\${organizationId}/inventory/\${inventoryId}/getProductAndCountByUPC/\${upc}`,
-  'GET'
-)
+  createInventory: ({ organizationId }) => (
+    {
+      path: `/organization/${organizationId}/inventory`,
+      method: 'post'
+    }
+  ),
 
-client.registerMethod(
-  'getInventoryProductsAndCounts',
-  `${ROOT_PATH}/organization/\${organizationId}/inventory/\${inventoryId}/getInventoryProductsAndCounts`,
-  'GET'
-)
+  getProductAndCountByUPC: ({ organizationId, inventoryId, upc }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/getProductAndCountByUPC/${upc}`,
+      method: 'get'
+    }
+  ),
 
+  getInventoryProductsAndCounts: ({ organizationId, inventoryId, filter }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryProductsAndCounts?filter=${filter}`,
+      method: 'get'
+    }
+  ),
 
-/* INVENTORY COUNT METHODS */
+  uploadProductsAndCounts: ({ organizationId, inventoryId }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/uploadProductsAndCounts`,
+      method: 'post'
+    }
+  ),
 
-client.registerMethod(
-  'updateInventoryCount',
-  `${ROOT_PATH}/organization/\${organizationId}/inventory/\${inventoryId}/count/\${upc}`,
-  'PUT'
-)
+  /* INVENTORY COUNT METHODS */
 
-client.registerMethod(
-  'insertInventoryCount',
-  `${ROOT_PATH}/organization/\${organizationId}/inventory/\${inventoryId}/count/\${upc}`,
-  'POST'
-)
+  updateInventoryCount: ({ organizationId, inventoryId, upc }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/count/${upc}`,
+      method: 'put'
+    }
+  ),
 
-
-/* ORGANIZATION METHODS */
-
-client.registerMethod(
-  'getOrganization',
-  `${ROOT_PATH}/organization`,
-  'GET'
-)
-
-
-/* PRODUCT METHODS */
-
-client.registerMethod(
-  'insertProduct',
-  `${ROOT_PATH}/organization/\${organizationId}/product`,
-  'POST'
-)
+  insertInventoryCount: ({ organizationId, inventoryId, upc }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/count/${upc}`,
+      method: 'post'
+    }
+  ),
 
 
-function makeApiCall(method, args) {
+  /* ORGANIZATION METHODS */
+
+  getOrganization: () => (
+    {
+      path: `/organization`,
+      method: 'get'
+    }
+  ),
+
+
+  /* PRODUCT METHODS */
+
+  insertProduct: ({ organizationId }) => (
+    {
+      path: `/organization/${organizationId}/product`,
+      method: 'post'
+    }
+  )
+}
+
+function makeApiCall(name, pathParams, payload) {
   return new Promise((resolve, reject) => {
-    console.log('args', args)
-    const req = client.methods[method](args, (data, response) => {
-      resolve(data)
-    })
 
-    req.on('requestTimeout', (r) => {
-      reject(new Error('Request Timed Out'))
-      r.abort()
-    })
+    const { path, method } = apiMethods[name](pathParams)
 
-    req.on('responseTimeout', (r) => {
-      reject(new Error('Response Timed Out'))
-    })
+    const handleResponse = (err, res, body) => {
+      if (err) return reject(err)
+      else return resolve(body)
+    }
 
-    req.on('error', (err) => {
-      reject(err)
-    })
+    if (['get', 'head', 'del'].includes(method)) {
+      client[method](path, handleResponse)
+    } else if (['post', 'put'].includes(method)) {
+      client[method](path, payload, handleResponse)
+    } else {
+      return reject(new Error(`Invalid API method [${method}]`))
+    }
   })
 }
 
 class JsonApi {
   async createNewInventory() {
-    const result = await makeApiCall('createInventory', {
-      path: {
-        organizationId: 1
-      }
-    })
+    const result = await makeApiCall('createInventory', { organizationId: 1 })
     return result
   }
 
@@ -99,116 +108,51 @@ class JsonApi {
     console.log("ooops. called getActiveInventory")
   }
 
-  async updateCount(key, changes) {
+  async updateCount(upc, inventoryId, manualQty) {
     const result = await makeApiCall('updateInventoryCount', {
-      path: {
-        organizationId: 1
-      }
-    })
+      organizationId: 1,
+      inventoryId,
+      upc
+    }, { manualQty })
     return result
   }
 
   async getAllInventories() {
-    const result = await makeApiCall('getInventory', {
-      path: {
-        organizationId: 1
-      }
-    })
+    const result = await makeApiCall('getInventory', { organizationId: 1 })
     return result
   }
 
-  insertProducts(products) {
-    return products.map(async (product) => {
-      const {
-        upc,
-        description,
-        brand,
-        type,
-        salesPrices,
-        sellinPrice,
-        inventoryId,
-        reportQty,
-        manualQty
-      } = product
-
-      const { id: product_id } = await makeApiCall('insertProduct', {
-        path: {
-          organizationId: 1
-        },
-        headers: {
-          "content-type": "applicaton/json"
-        },
-        data: {
-          upc,
-          description,
-          brand,
-          type,
-          sales_price: salesPrices,
-          sell_in_price: sellinPrice,
-        }
-      })
-
-      const { id: inventory_id } = await makeApiCall('insertInventoryCount', {
-        path: {
-          organizationId: 1,
-          inventoryId,
-          upc
-        },
-        headers: {
-          "content-type": "applicaton/json"
-        },        
-        data: {
-          reportQty,
-          manualQty
-        }
-      })
-      return { inventory_id, product_id }
-    })
+  async insertProducts(inventoryId, products) {
+    const result = await makeApiCall('uploadProductsAndCounts', {
+      organizationId: 1,
+      inventoryId
+    }, { products })
+    return result
   }
 
   async getProductAndCountByUPC(upc, inventoryId) {
-    const result = await makeApiCall('getProductAndCountByUPC', {
-      path: {
+    const result = await makeApiCall(
+      'getProductAndCountByUPC',
+      {
         organizationId: 1,
         inventoryId,
         upc
       }
-    })
+    )
     return result
   }
 
   async getInventoryProductsAndCounts(inventoryId, filter = 'all') {
-    const result = await makeApiCall('getInventoryProductsAndCounts', {
-      path: {
+    const result = await makeApiCall(
+      'getInventoryProductsAndCounts',
+      {
         organizationId: 1,
-        inventoryId
+        inventoryId,
+        filter
       }
-    })
+    )
     return result
   }
-
-  // insertInventoryCounts(inventoryId, inventoryCounts) {
-  //   return inventoryCounts.map(async (inventoryCount) => {
-  //
-  //     const { upc,
-  //       inventoryId,
-  //       reportQty,
-  //       manualQty
-  //     } = inventoryCount
-  //
-  //     return await makeApiCall('insertInventoryCount', {
-  //       path: {
-  //         organizationId: 1,
-  //         inventoryId,
-  //         upc
-  //       },
-  //       data: {
-  //         reportQty,
-  //         manualQty
-  //       }
-  //     })
-  //   })
-  // }
 }
 
 export default JsonApi

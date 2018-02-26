@@ -13,16 +13,15 @@ const cors = corsMiddleware({
 const server = restify.createServer()
 const pool = new Pool()
 
-async function queryDB({ text, values, name }, expectRows = true) {
+async function queryDB({ text, values, name }, expectRows = true, forceArray = false) {
   const { rows, rowCount } = await pool.query({
     text,
     values
   })
 
-  if (rows.length === 1) {
+  if (!forceArray && rows.length === 1) {
     return rows[0]
-    return next()
-  } else if (rows.length > 1) {
+  } else if (forceArray || rows.length > 1) {
     return rows
   } else if (!expectRows) {
     return { rowCount }
@@ -32,14 +31,14 @@ async function queryDB({ text, values, name }, expectRows = true) {
 }
 
 const db = {
-  select: async (params) => {
-    return await queryDB(params)
+  select: async (params, forceArray = false) => {
+    return await queryDB(params, true, forceArray)
   },
-  insert: async (params) => {
-    return await queryDB(params)
+  insert: async (params, forceArray = false) => {
+    return await queryDB(params, true, forceArray)
   },
-  update: async (params) => {
-    return await queryDB(params, false)
+  update: async (params, forceArray = false) => {
+    return await queryDB(params, false, forceArray)
   }
 }
 
@@ -63,5 +62,5 @@ requireAndInit([
 ])
 
 server.listen(8080, function() {
-  // console.log('%s listening at %s', server.name, server.url)
+  console.log('%s listening at %s', server.name, server.url)
 })

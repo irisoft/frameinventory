@@ -30,9 +30,12 @@ class Home extends Component {
       const {
         id,
         start_date,
-        underCount,
-        overCount
+        under_count,
+        over_count
       } = inventory
+
+      const overCount = parseInt(over_count.toString(), 10)
+      const underCount = parseInt(under_count.toString(), 10)
 
       const startDate = new Date(Date.parse(start_date)).toDateString()
 

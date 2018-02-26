@@ -10,7 +10,7 @@ function InventoryCount(server, db) {
       organizationId,
       inventoryId,
       upc,
-      count
+      manualQty
     } = req.params
 
     try {
@@ -19,6 +19,8 @@ function InventoryCount(server, db) {
         text: `
           UPDATE
             inventory_count
+          SET
+            manual_qty = $4
           WHERE
             inventory_id = $1 AND
             product_id = (
@@ -31,10 +33,8 @@ function InventoryCount(server, db) {
                 upc = $3
               LIMIT 1
             )
-          SET
-            manual_qty = $4
         `,
-        values: [ inventoryId, organizationId, upc, count ]
+        values: [ inventoryId, organizationId, upc, manualQty ]
       }))
       return next()
     } catch (err) {
@@ -53,7 +53,7 @@ function InventoryCount(server, db) {
       manualQty,
       reportQty
     } = req.params
-    
+
     try {
       res.send(await db.insert({
         name: 'insertInventoryCounts',
@@ -73,7 +73,8 @@ function InventoryCount(server, db) {
             )
           RETURNING
             id
-        `
+        `,
+        values: [ organizationId, upc ]
       }))
       return next()
     } catch(err) {

@@ -26,10 +26,9 @@ function Inventory(server, db) {
             ${status ? ' AND status=$2' : ''}
         `,
         values: status ? [ organizationId, status ] : [ organizationId ]
-      }))
+      }, true))
       return next()
     } catch (err) {
-      console.log(err.stack)
       return next(err)
     }
   })
@@ -85,7 +84,7 @@ function Inventory(server, db) {
           	c.inventory_id = $1 AND
           	p.upc = $2
         `,
-        value: [ inventory_id, upc ]
+        values: [ inventoryId, upc ]
       }))
       return next()
     } catch (err) {
@@ -103,6 +102,17 @@ function Inventory(server, db) {
       inventoryId
     } = req.params
 
+    const { filter } = req.query
+
+    let filterClause = ''
+    if (filter === 'over') {
+      filterClause = 'AND c.manual_qty > c.report_qty'
+    } else if (filter === 'under') {
+      filterClause = 'AND c.manual_qty < c.report_qty'
+    } else if (filter === 'even') {
+      filterClause = 'AND c.manual_qty = c.report_qty'
+    }
+
     try {
       res.send(await db.select({
         name: 'getInventoryProductsAndCounts',
@@ -115,12 +125,110 @@ function Inventory(server, db) {
           	product p ON c.product_id = p.id
           WHERE
           	c.inventory_id = $1
+            ${filterClause}
         `,
-        value: [ inventory_id ]
-      }))
+        values: [ inventoryId ]
+      }, true))
       return next()
     } catch (err) {
       return next(err)
+    }
+  })
+
+  server.post({
+    name: 'uploadProductsAndCounts',
+    path: `${ROOT_PATH}/:inventoryId/uploadProductsAndCounts`
+  }, async function(req, res, next) {
+    const {
+      organizationId,
+      inventoryId,
+      products
+    } = req.params
+
+    if (Array.isArray(products)) {
+      const ids = await Promise.all(products.map(function(product) {
+        return new Promise(async (resolve, reject) => {
+          const {
+            upc,
+            brand,
+            description,
+            salesPrice,
+            sellinPrice,
+            type,
+            reportQty,
+            manualQty
+          } = product
+
+          let productResult, inventoryCountResult
+
+          try {
+            productResult = await db.insert({
+              name: 'insertProduct',
+              text: `
+                INSERT INTO
+                  product (
+                    organization_id,
+                    upc,
+                    brand,
+                    description,
+                    sales_price,
+                    sell_in_price,
+                    type
+                  )
+                VALUES ( $1, $2, $3, $4, $5, $6, $7 )
+                ON CONFLICT
+                  (upc, organization_id)
+                DO UPDATE SET
+                  brand = $3,
+                  description = $4,
+                  sales_price = $5,
+                  sell_in_price = $6,
+                  type = $7
+                RETURNING
+                  id
+              `,
+              values: [ organizationId, upc, brand, description, salesPrice, sellinPrice, type ]
+            })
+          } catch(err) {
+            reject(err)
+          }
+
+          try {
+            inventoryCountResult = await db.insert({
+              name: 'insertInventoryCount',
+              text: `
+                INSERT INTO
+                  inventory_count (
+                    inventory_id,
+                    product_id,
+                    manual_qty,
+                    report_qty
+                  )
+                VALUES (
+                    $1,
+                    (SELECT id FROM product WHERE organization_id = $2 AND upc = $3 LIMIT 1),
+                    $4,
+                    $5
+                  )
+                RETURNING
+                  id
+              `,
+              values: [ inventoryId, organizationId, upc, manualQty, reportQty ]
+            })
+          } catch(err) {
+            reject(err)
+          }
+
+          const { id: inventoryCountId } = inventoryCountResult
+          const { id: productId } =  productResult
+
+          resolve({ productId, inventoryCountId })
+        })
+      }))
+      res.send({ ids })
+      return next()
+    } else {
+      return next(new Error('Parameter [products] must be an array.'))
     }
   })
 }
