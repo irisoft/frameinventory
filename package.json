@@ -4,7 +4,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node ./src/index.js",
-    "postinstall": "cd ./client && npm build"
+    "postinstall": "cd ./client && npm run build"
   },
   "engines": {
     "node": "8.9.4"
