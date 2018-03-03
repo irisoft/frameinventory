@@ -1,26 +1,22 @@
 {
-  "name": "inventory",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "bootstrap": "4.0.0-alpha.6",
-    "browser-beep": "^1.0.2",
-    "dexie": "^2.0.1",
-    "prop-types": "^15.6.0",
-    "quagga": "^0.12.1",
-    "react": "^16.2.0",
-    "react-data-grid": "^3.0.8",
-    "react-dom": "^16.2.0",
-    "react-router-dom": "^4.2.2",
-    "react-scripts": "1.0.17",
-    "react-transition-group": "^2.2.1",
-    "reactstrap": "^5.0.0-alpha.4",
-    "xlsx": "^0.11.18"
-  },
+  "name": "irisoft.inventory.server",
+  "version": "1.0.0",
+  "main": "src/index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "start": "node ./src/index.js"
+  },
+  "engines": {
+    "node": "8.9.4"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "pg": "^7.4.1",
+    "restify": "^6.3.4",
+    "restify-cors-middleware": "^1.1.0",
+    "restify-errors": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "eslint-config-google": "^0.9.1"
   }
 }

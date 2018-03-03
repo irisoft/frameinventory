@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // import PropTypes from 'prop-types'
 import Quagga from 'quagga'
 import Scanner from '../components/Scanner'
-import DataAdapter from '../dataAdapters/LocalIndexedDB'
+import DataAdapter from '../dataAdapters/JsonApi'
 import { Link } from 'react-router-dom'
 import { Navbar, Nav, Button } from 'reactstrap'
 import Beep from  'browser-beep'
@@ -28,12 +28,7 @@ class Scan extends Component {
 
   validateItem = (item) => {
     if (!(typeof item === 'object')) return false
-    if (!('product' in item)) return false
-    if (!('inventoryCount' in item)) return false
-    if (!Array.isArray(item.product)) return false
-    if (!Array.isArray(item.inventoryCount)) return false
-    if (item.product.length === 0) return false
-    if (item.inventoryCount.length === 0) return false
+    if (!('product_id' in item)) return false
     return true
   }
 
@@ -48,6 +43,7 @@ class Scan extends Component {
 
     inventoryId = parseInt(inventoryId.toString(), 10)
 
+    console.log('result', result)
     Quagga.pause()
     this.setState({ scanReady: false })
     let productAndCount = await this.dataAdapter.getProductAndCountByUPC(result.codeResult.code, inventoryId)
@@ -55,8 +51,8 @@ class Scan extends Component {
     if (isValid) {
       beep(1)
       this.setState({ scannedItem: productAndCount }, async () => {
-        await this.dataAdapter.updateCount([ inventoryId, productAndCount.product[0].upc ], { manualQty: (productAndCount.inventoryCount[0].manualQty + 1) })
-        productAndCount = await this.dataAdapter.getProductAndCountByUPC(result.codeResult.code, inventoryId)
+        await this.dataAdapter.updateCount(productAndCount.upc, inventoryId, (parseInt(productAndCount.manual_qty.toString(), 10) + 1))
+        productAndCount = await this.dataAdapter.getProductAndCountByUPC(productAndCount.upc, inventoryId)
         this.setState({ scannedItem: productAndCount })
       })
     } else {
@@ -113,15 +109,15 @@ class Scan extends Component {
               </div>
               <div className="row">
                 <div className="col-6">
-                  <h4>{scannedItem.product[0].brand}</h4>
-                  <div>{scannedItem.product[0].upc}</div>
-                  <div>{scannedItem.product[0].description}</div>
+                  <h4>{scannedItem.brand}</h4>
+                  <div>{scannedItem.upc}</div>
+                  <div>{scannedItem.description}</div>
                 </div>
                 <div className="col-3 text-right">
-                  {scannedItem.inventoryCount[0].reportQty}
+                  {scannedItem.report_qty}
                 </div>
                 <div className="col-3 text-right">
-                  {scannedItem.inventoryCount[0].manualQty}
+                  {scannedItem.manual_qty}
                 </div>
               </div>
             </div>

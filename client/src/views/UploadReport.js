@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { Navbar, Nav, Button } from 'reactstrap'
 import XLSX from 'xlsx'
-import DataAdapter from '../dataAdapters/LocalIndexedDB'
+import DataAdapter from '../dataAdapters/JsonApi'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -44,8 +44,7 @@ class UploadReport extends Component {
 
       const json = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1'])
 
-      this.dataAdapter.createNewInventory().then((inventoryId) => {
-        const inventoryCounts = []
+      this.dataAdapter.createNewInventory().then( async ({ id: inventoryId }) => {
         const products = []
 
         json.forEach((row) => {
@@ -55,23 +54,14 @@ class UploadReport extends Component {
             brand: row['Product Brand'],
             type: row['Product Type'],
             salesPrices: row['Sales Price'],
-            sellinPrice: row['Sell-in Price']
-          }
-
-          const inventoryCount = {
-            inventoryId,
-            upc: row['EAN/UPC'],
+            sellinPrice: row['Sell-in Price'],
             reportQty: parseInt(row['Quantity'].toString(), 10),
             manualQty: 0
           }
-
           products.push(product)
-          inventoryCounts.push(inventoryCount)
         })
 
-        this.dataAdapter.insertProducts(products)
-        this.dataAdapter.insertInventoryCounts(inventoryCounts)
-
+        await this.dataAdapter.insertProducts(inventoryId, products)
         this.setState({ readyToRedirect: true, inventoryId })
       })
     }
@@ -95,7 +85,7 @@ class UploadReport extends Component {
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/`}>
-              <Button color="danger" size="md"><i class="fas fa-times-circle"></i> Cancel</Button>
+              <Button color="danger" size="md"><i className="fas fa-times-circle"></i> Cancel</Button>
             </Link>
           </Nav>
         </Navbar>
