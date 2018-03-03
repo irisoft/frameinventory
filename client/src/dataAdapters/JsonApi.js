@@ -1,6 +1,6 @@
 import request from 'request-json'
 
-const client = request.createClient('http://localhost:8080')
+const client = request.createClient(window.location.origin)
 
 const apiMethods = {
 
