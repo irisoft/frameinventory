@@ -13,7 +13,10 @@ const cors = corsMiddleware({
 })
 
 const server = restify.createServer()
-const pool = new Pool()
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true
+})
 
 async function queryDB({ text, values, name }, expectRows = true, forceArray = false) {
   const { rows, rowCount } = await pool.query({
