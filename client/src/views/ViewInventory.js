@@ -109,7 +109,6 @@ class ViewInventory extends Component {
 
   measureHeight = (el) => {
     if (el) {
-      // console.log('height', el.offsetHeight, el.clientHeight, el.scrollHeight)
       this.setState({ gridHeight: parseInt(el.offsetHeight.toString(), 10) - 43 - 54 })
     }
   }

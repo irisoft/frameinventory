@@ -17,7 +17,8 @@ class Scan extends Component {
       scanning: true,
       scanResults: [],
       scannedItem: false,
-      scanReady: false
+      scanReady: false,
+      failedCode: null
     }
     this.dataAdapter = new DataAdapter()
   }
@@ -43,7 +44,6 @@ class Scan extends Component {
 
     inventoryId = parseInt(inventoryId.toString(), 10)
 
-    console.log('result', result)
     Quagga.pause()
     this.setState({ scanReady: false })
     let productAndCount = await this.dataAdapter.getProductAndCountByUPC(result.codeResult.code, inventoryId)
@@ -57,13 +57,13 @@ class Scan extends Component {
       })
     } else {
       boop(2)
-      this.setState({ scannedItem: false })
+      this.setState({ scannedItem: false, failedCode: result.codeResult.code })
     }
 
     setTimeout(() => {
       Quagga.start()
       this.setState({ scanReady: true })
-    }, 1000)
+    }, 5000)
   }
 
   render() {
@@ -75,7 +75,12 @@ class Scan extends Component {
       },
     } = this.props
 
-    const { scannedItem, scanning, scanReady } = this.state
+    const {
+      scannedItem,
+      scanning,
+      scanReady,
+      failedCode
+    } = this.state
 
     const ledStyle = {
       borderRadius: '50%',
@@ -121,7 +126,15 @@ class Scan extends Component {
                 </div>
               </div>
             </div>
-          ) : (<i className="text-center" style={{ display: 'block' }}>Scan a barcode to get started.</i>)}
+          ) : (
+            <div>
+              { failedCode
+                ? <i className="text-center" style={{ display: 'block' }}>Couldn't find a product for <b>{failedCode}</b></i>
+                : <i className="text-center" style={{ display: 'block' }}>Scan a barcode to get started.</i>
+              }
+            </div>
+          )
+        }
         </div>
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">

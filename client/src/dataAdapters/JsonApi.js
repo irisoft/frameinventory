@@ -104,10 +104,6 @@ class JsonApi {
     return result
   }
 
-  getActiveInventory() {
-    console.log("ooops. called getActiveInventory")
-  }
-
   async updateCount(upc, inventoryId, manualQty) {
     const result = await makeApiCall('updateInventoryCount', {
       organizationId: 1,

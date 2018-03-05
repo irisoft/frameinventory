@@ -25,8 +25,6 @@ class Home extends Component {
     const { inventories } = this.state
     const inventoriesItems = Array.isArray(inventories) && inventories.map((inventory) => {
 
-      console.log('i', inventory)
-
       const {
         id,
         start_date,

@@ -32,7 +32,6 @@ class Scanner extends Component {
       locate: true
     }, function(err) {
       if (err) {
-        return console.log(err)
       }
       Quagga.start()
     })
@@ -40,6 +39,7 @@ class Scanner extends Component {
   }
 
   componentWillUnmount() {
+    Quagga.stop();
     Quagga.offDetected(this.handleDetected);
   }
 
