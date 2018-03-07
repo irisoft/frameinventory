@@ -50,7 +50,7 @@ class Scan extends Component {
     const isValid = this.validateItem(productAndCount)
     if (isValid) {
       beep(1)
-      this.setState({ scannedItem: productAndCount }, async () => {
+      this.setState({ scannedItem: productAndCount, failedCode: null }, async () => {
         await this.dataAdapter.updateCount(productAndCount.upc, inventoryId, (parseInt(productAndCount.manual_qty.toString(), 10) + 1))
         productAndCount = await this.dataAdapter.getProductAndCountByUPC(productAndCount.upc, inventoryId)
         this.setState({ scannedItem: productAndCount })
