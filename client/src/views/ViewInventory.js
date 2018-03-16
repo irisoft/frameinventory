@@ -3,22 +3,29 @@ import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import DataAdapter from '../dataAdapters/JsonApi'
 import { Link } from 'react-router-dom'
+import Media from 'react-media'
 import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
 
-const FilterButton = ({ color, active, size, children, filterValue, onClick }) => {
+const FilterButton = ({ color, active, size, children, filterValue, onClick, screenIsSmall }) => {
+  const style = {}
+
+  if (!screenIsSmall) {
+    style.width = 120
+  }
+
   return (
-      <Button
-        // color={color}
-        active={active}
-        size={size}
-        onClick={() => {
-          if (typeof onClick === 'function') {
-            onClick(filterValue)
-          }
-        }}
-      >
-        {children}
-      </Button>
+    <Button
+      style={style}
+      active={active}
+      size={size}
+      onClick={() => {
+        if (typeof onClick === 'function') {
+          onClick(filterValue)
+        }
+      }}
+    >
+      {children}
+    </Button>
   )
 }
 
@@ -33,11 +40,22 @@ class ViewInventory extends Component {
     }
     this.dataAdapter = new DataAdapter()
     this.fetchData = this.fetchData.bind(this)
-    this.columns = [
-      { key: 'upc', name: 'UPC', sortable: true },
-      { key: 'report_qty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right' },
-      { key: 'manual_qty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true }
-    ]
+    this.columns = (screenIsSmall) => {
+      let columns = [
+        { key: 'upc', name: 'UPC', width: 120, sortable: true }
+      ]
+
+      if (!screenIsSmall) {
+        columns.push({ key: 'brand', name: 'Brand', width: 120, sortable: true })
+        columns.push({ key: 'type', name: 'Type', width: 80, sortable: true })
+        columns.push({ key: 'description', name: 'Description', sortable: true })
+      }
+
+      columns.push({ key: 'report_qty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right' })
+      columns.push({ key: 'manual_qty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true })
+
+      return columns
+    }
   }
 
   componentDidMount() {
@@ -117,43 +135,48 @@ class ViewInventory extends Component {
     const { inventoryProductsAndCounts, filter, gridHeight } = this.state
     const { match: { params: { inventoryId } } } = this.props
     return (
-      <div className="max-height" ref={this.measureHeight}>
-        <Navbar light color="inverse" className="justify-content-between">
-          <Nav className="bottom-nav">
-            <ButtonGroup>
-              <FilterButton color="secondary" size="sm" active={filter === 'all'} onClick={this.handleFilter} filterValue="all">All</FilterButton>
-              <FilterButton color="warning" size="sm" active={filter === 'over'} onClick={this.handleFilter} filterValue="over">Over</FilterButton>
-              <FilterButton color="danger" size="sm" active={filter === 'under'} onClick={this.handleFilter} filterValue="under">Under</FilterButton>
-              <FilterButton color="success" size="sm" active={filter === 'even'} onClick={this.handleFilter} filterValue="even">Even</FilterButton>
-            </ButtonGroup>
-          </Nav>
-        </Navbar>
-        {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
-          <ReactDataGrid
-            columns={this.columns}
-            rowGetter={this.rowGetter}
-            rowsCount={inventoryProductsAndCounts.length}
-            minHeight={gridHeight}
-            onGridSort={this.handleGridSort}
-            enableCellSelect={true}
-            onGridRowsUpdated={this.handleGridRowsUpdated}
-          />
-        }
+      <Media query="(max-width: 599px)">
+        {screenIsSmall => (
+          <div className="max-height" ref={this.measureHeight}>
+            <Navbar light color="inverse" className={`${screenIsSmall && 'justify-content-between'}`}>
+              <Nav className="bottom-nav">
+                { !screenIsSmall && <p style={{color:'white'}}>Filter:</p> }
+                <ButtonGroup>
+                  <FilterButton screenIsSmall={screenIsSmall} color="secondary" size="sm" active={filter === 'all'} onClick={this.handleFilter} filterValue="all">All</FilterButton>
+                  <FilterButton screenIsSmall={screenIsSmall} color="warning" size="sm" active={filter === 'over'} onClick={this.handleFilter} filterValue="over">Over</FilterButton>
+                  <FilterButton screenIsSmall={screenIsSmall} color="danger" size="sm" active={filter === 'under'} onClick={this.handleFilter} filterValue="under">Under</FilterButton>
+                  <FilterButton screenIsSmall={screenIsSmall} color="success" size="sm" active={filter === 'even'} onClick={this.handleFilter} filterValue="even">Even</FilterButton>
+                </ButtonGroup>
+              </Nav>
+            </Navbar>
+            {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
+              <ReactDataGrid
+                columns={this.columns(screenIsSmall)}
+                rowGetter={this.rowGetter}
+                rowsCount={inventoryProductsAndCounts.length}
+                minHeight={gridHeight}
+                onGridSort={this.handleGridSort}
+                enableCellSelect={true}
+                onGridRowsUpdated={this.handleGridRowsUpdated}
+              />
+            }
 
-        <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
-          <Nav className="bottom-nav">
-            <Link to="/">
-              <Button color="secondary" size="md"><i className="fas fa-home"></i> Home</Button>
-            </Link>
-            <Link to={`/scan/${inventoryId}`}>
-              <Button color="primary" size="md"><i className="fas fa-barcode"></i> Scan</Button>
-            </Link>
-            <Link to="/">
-              <Button color="success" size="md"><i className="fas fa-check-square"></i> Done</Button>
-            </Link>
-          </Nav>
-        </Navbar>
-      </div>
+            <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
+              <Nav className="bottom-nav">
+                <Link to="/">
+                  <Button color="secondary" size="md"><i className="fas fa-home"></i> Home</Button>
+                </Link>
+                <Link to={`/scan/${inventoryId}`}>
+                  <Button color="primary" size="md"><i className="fas fa-barcode"></i> Scan</Button>
+                </Link>
+                <Link to="/">
+                  <Button color="success" size="md"><i className="fas fa-check-square"></i> Done</Button>
+                </Link>
+              </Nav>
+            </Navbar>
+          </div>
+        )}
+      </Media>
     )
   }
 }

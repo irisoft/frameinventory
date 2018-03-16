@@ -10,11 +10,12 @@ function InventoryListItem({ id, title, description, overCount, underCount }) {
   return (
     <Link to={`/inventory/${id}`} >
       <ListGroupItem className="justify-content-between">
+        <button className="btn btn-sm btn-success">View</button>
         {title}
         <div>
-          <Badge pill color={overColor}>{overCount}</Badge>
+          <Badge pill color={overColor}>Over: {overCount}</Badge>
           &nbsp;
-          <Badge pill color={underColor}>{underCount}</Badge>
+          <Badge pill color={underColor}>Under: {underCount}</Badge>
         </div>
       </ListGroupItem>
     </Link>

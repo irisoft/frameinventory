@@ -49,6 +49,7 @@ class Home extends Component {
     })
     return (
       <div>
+        <h1>Inventory Reports</h1>
         <ListGroup>
           {inventoriesItems}
         </ListGroup>
