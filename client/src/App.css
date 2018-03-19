@@ -1,9 +1,14 @@
-html, body, div, a, button, input {
-  font-family: 'Oswald', 'sans-serif';
-}
+/* html, body, div, a, button, input {
+  font-family: 'Helvetica', 'Arial', 'sans-serif';
+} */
 
 .react-grid-Container {
   font-size: 12px;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: white;
+  color: rgba(255,255,255,0.7);
 }
 
 .padded {
@@ -43,32 +48,32 @@ html, body, div, a, button, input {
   height: 280.5px;
 }
 
-canvas.drawingBuffer {
+.drawingBuffer {
   display: none;
 }
 
 .btn-success {
-  color: #fff;
   background-color: #8dc600;
   border-color: #8dc600;
+  color: #fff;
 }
 
 .btn-primary {
-  color: #fff;
   background-color: #007494;
   border-color: #007494;
+  color: #fff;
 }
 
 .btn-warning {
-  color: #fff;
   background-color: #FFD166;
   border-color: #FFD166;
+  color: #fff;
 }
 
 .btn-danger {
-  color: #fff;
   background-color: #EF476F;
   border-color: #EF476F;
+  color: #fff;
 }
 
 .btn-group {
@@ -89,6 +94,6 @@ canvas.drawingBuffer {
 
 h1 {
   font-size: 25px;
-  padding: 15px 21px;
   margin: 0;
+  padding: 15px 21px;
 }

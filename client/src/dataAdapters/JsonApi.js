@@ -9,35 +9,35 @@ const apiMethods = {
   getInventory: ({ organizationId }) => (
     {
       path: `/organization/${organizationId}/inventory`,
-      method: 'get'
+      method: 'get',
     }
   ),
 
   createInventory: ({ organizationId }) => (
     {
       path: `/organization/${organizationId}/inventory`,
-      method: 'post'
+      method: 'post',
     }
   ),
 
   getProductAndCountByUPC: ({ organizationId, inventoryId, upc }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/getProductAndCountByUPC/${upc}`,
-      method: 'get'
+      method: 'get',
     }
   ),
 
   getInventoryProductsAndCounts: ({ organizationId, inventoryId, filter }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryProductsAndCounts?filter=${filter}`,
-      method: 'get'
+      method: 'get',
     }
   ),
 
   uploadProductsAndCounts: ({ organizationId, inventoryId }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/uploadProductsAndCounts`,
-      method: 'post'
+      method: 'post',
     }
   ),
 
@@ -46,14 +46,14 @@ const apiMethods = {
   updateInventoryCount: ({ organizationId, inventoryId, upc }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/count/${upc}`,
-      method: 'put'
+      method: 'put',
     }
   ),
 
   insertInventoryCount: ({ organizationId, inventoryId, upc }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/count/${upc}`,
-      method: 'post'
+      method: 'post',
     }
   ),
 
@@ -62,8 +62,8 @@ const apiMethods = {
 
   getOrganization: () => (
     {
-      path: `/organization`,
-      method: 'get'
+      path: '/organization',
+      method: 'get',
     }
   ),
 
@@ -73,19 +73,18 @@ const apiMethods = {
   insertProduct: ({ organizationId }) => (
     {
       path: `/organization/${organizationId}/product`,
-      method: 'post'
+      method: 'post',
     }
-  )
+  ),
 }
 
 function makeApiCall(name, pathParams, payload) {
   return new Promise((resolve, reject) => {
-
     const { path, method } = apiMethods[name](pathParams)
 
     const handleResponse = (err, res, body) => {
       if (err) return reject(err)
-      else return resolve(body)
+      return resolve(body)
     }
 
     if (['get', 'head', 'del'].includes(method)) {
@@ -98,57 +97,57 @@ function makeApiCall(name, pathParams, payload) {
   })
 }
 
-class JsonApi {
-  async createNewInventory() {
+const JsonApi = {
+  createNewInventory: async () => {
     const result = await makeApiCall('createInventory', { organizationId: 1 })
     return result
-  }
+  },
 
-  async updateCount(upc, inventoryId, manualQty) {
+  updateCount: async (upc, inventoryId, manualQty) => {
     const result = await makeApiCall('updateInventoryCount', {
       organizationId: 1,
       inventoryId,
-      upc
+      upc,
     }, { manualQty })
     return result
-  }
+  },
 
-  async getAllInventories() {
+  getAllInventories: async () => {
     const result = await makeApiCall('getInventory', { organizationId: 1 })
     return result
-  }
+  },
 
-  async insertProducts(inventoryId, products) {
+  insertProducts: async (inventoryId, products) => {
     const result = await makeApiCall('uploadProductsAndCounts', {
       organizationId: 1,
-      inventoryId
+      inventoryId,
     }, { products })
     return result
-  }
+  },
 
-  async getProductAndCountByUPC(upc, inventoryId) {
+  getProductAndCountByUPC: async (upc, inventoryId) => {
     const result = await makeApiCall(
       'getProductAndCountByUPC',
       {
         organizationId: 1,
         inventoryId,
-        upc
-      }
+        upc,
+      },
     )
     return result
-  }
+  },
 
-  async getInventoryProductsAndCounts(inventoryId, filter = 'all') {
+  getInventoryProductsAndCounts: async (inventoryId, filter = 'all') => {
     const result = await makeApiCall(
       'getInventoryProductsAndCounts',
       {
         organizationId: 1,
         inventoryId,
-        filter
-      }
+        filter,
+      },
     )
     return result
-  }
+  },
 }
 
 export default JsonApi

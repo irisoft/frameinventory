@@ -1,44 +1,42 @@
-import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Navbar, NavbarBrand } from 'reactstrap'
-import Home from './views/Home'
-import ViewInventory from './views/ViewInventory'
-import Scan from './views/Scan'
-import UploadReport from './views/UploadReport'
-import logo from './assets/company-logo-white.png'
+import React from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { Security, SecureRoute, ImplicitCallback } from '@okta/okta-react'
+import NoAuthContainer from './views/NoAuthContainer'
+import AuthContainer from './views/auth/AuthContainer'
+import TopNavBar from './components/TopNavBar'
 import './App.css'
 
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
-  }
-
-  render() {
-    return (
-      <Router>
-        <div className="max-height">
-          <Navbar light color="inverse" fixed="top" className="justify-content-between">
-            <NavbarBrand>
-              <div className="d-flex align-items-center">
-                <img alt="Irisoft Logo" height={18} src={logo} />
-                &nbsp;
-                <span className="text-white">Inventory</span>
-              </div>
-            </NavbarBrand>
-          </Navbar>
-
-          <Route exact path="/" component={Home} />
-          <Route path="/upload" component={UploadReport} />
-          <Route path="/inventory/:inventoryId" component={ViewInventory} />
-          <Route path="/scan/:inventoryId" component={Scan} />
-        </div>
-      </Router>
-    )
-  }
+const config = {
+  issuer: 'https://dev-924982.oktapreview.com/oauth2/default',
+  redirect_uri: `${window.location.origin}/implicit/callback`,
+  client_id: '0oaecgijbzWW1fNFC0h7',
 }
 
-export default App;
+function onAuthRequired({ history }) {
+  history.push('/sign-in')
+}
+
+function App() {
+  return (
+    <Router>
+      <Security
+        issuer={config.issuer}
+        client_id={config.client_id}
+        redirect_uri={config.redirect_uri}
+        onAuthRequired={onAuthRequired}
+      >
+        <TopNavBar />
+        <NoAuthContainer />
+        <Route path="/implicit/callback" component={ImplicitCallback} />
+        <div className="max-height">
+          <SecureRoute path="/auth" component={AuthContainer} />
+        </div>
+      </Security>
+    </Router>
+  )
+}
+
+export default App
 
 
 // green #8dc600
