@@ -12,11 +12,13 @@ function getInventoryCounts(db, inventoryId, filter) {
   let collection = db.inventoryCount.where({ inventoryId })
 
   if (filter === 'even') {
-    collection = collection.and((item) => { return item.manualQty === item.reportQty })
+    collection = collection.and(item => item.manualQty === item.reportQty)
   } else if (filter === 'over') {
-    collection = collection.and((item) => { return parseInt(item.manualQty.toString(), 10) > parseInt(item.reportQty.toString(), 10) })
+    collection = collection.and(item =>
+      parseInt(item.manualQty.toString(), 10) > parseInt(item.reportQty.toString(), 10))
   } else if (filter === 'under') {
-    collection = collection.and((item) => { return parseInt(item.manualQty.toString(), 10) < parseInt(item.reportQty.toString(), 10) })
+    collection = collection.and(item =>
+      parseInt(item.manualQty.toString(), 10) < parseInt(item.reportQty.toString(), 10))
   }
 
   return collection.toArray()
@@ -29,19 +31,19 @@ function getInventoryCount(db, upc, inventoryId) {
 class LocalIndexedDB {
   constructor() {
     // Setup New Database
-    this.db = new Dexie("test")
+    this.db = new Dexie('test')
 
     // Define Schema
     this.db.version(1).stores({
-      product: "&upc,description,brand,type,salesPrice,sellinPrice",
-      inventory: "++id,startDate,status",
-      inventoryCount: "[inventoryId+upc],upc,reportQty,manualQty"
+      product: '&upc,description,brand,type,salesPrice,sellinPrice',
+      inventory: '++id,startDate,status',
+      inventoryCount: '[inventoryId+upc],upc,reportQty,manualQty',
     })
 
     this.db.version(2).stores({
-      product: "&upc,description,brand,type,salesPrice,sellinPrice",
-      inventory: "++id,startDate,status",
-      inventoryCount: "[inventoryId+upc],inventoryId,upc,reportQty,manualQty"
+      product: '&upc,description,brand,type,salesPrice,sellinPrice',
+      inventory: '++id,startDate,status',
+      inventoryCount: '[inventoryId+upc],inventoryId,upc,reportQty,manualQty',
     })
   }
 
@@ -73,9 +75,9 @@ class LocalIndexedDB {
       productsAndCounts.forEach((product) => {
         const { manualQty, reportQty } = product
         if (manualQty > reportQty) {
-          overCount++
+          overCount += 1
         } else if (reportQty > manualQty) {
-          underCount++
+          underCount += 1
         }
       })
 
@@ -83,7 +85,7 @@ class LocalIndexedDB {
         id,
         startDate,
         overCount,
-        underCount
+        underCount,
       }
     }))
 
@@ -101,7 +103,7 @@ class LocalIndexedDB {
     const inventoryCount = await getInventoryCount(this.db, upc, inventoryId)
     return {
       product,
-      inventoryCount
+      inventoryCount,
     }
   }
 
@@ -109,11 +111,8 @@ class LocalIndexedDB {
   async getInventoryProductsAndCounts(inventoryId, filter = 'all') {
     const products = await getProducts(this.db)
     const inventoryCounts = await getInventoryCounts(this.db, inventoryId, filter)
-    return inventoryCounts.map((ic) => {
-      return Object.assign({}, ic, products.find((product) => {
-        return (product.upc === ic.upc)
-      }))
-    })
+    return inventoryCounts.map(ic =>
+      Object.assign({}, ic, products.find(product => (product.upc === ic.upc))))
   }
 
   /**/

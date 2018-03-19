@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
-import DataAdapter from '../dataAdapters/JsonApi'
 import { Link } from 'react-router-dom'
 import Media from 'react-media'
 import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
+import DataAdapter from '../../dataAdapters/JsonApi'
 
-const FilterButton = ({ color, active, size, children, filterValue, onClick, screenIsSmall }) => {
+const FilterButton = ({
+  active, size, children, filterValue, onClick, screenIsSmall,
+}) => {
   const style = {}
 
   if (!screenIsSmall) {
@@ -29,6 +31,24 @@ const FilterButton = ({ color, active, size, children, filterValue, onClick, scr
   )
 }
 
+FilterButton.propTypes = {
+  active: PropTypes.bool,
+  size: PropTypes.number,
+  children: PropTypes.node,
+  filterValue: PropTypes.string,
+  onClick: PropTypes.func,
+  screenIsSmall: PropTypes.bool,
+}
+
+FilterButton.defaultProps = {
+  active: false,
+  size: null,
+  children: null,
+  filterValue: null,
+  onClick: null,
+  screenIsSmall: true,
+}
+
 class ViewInventory extends Component {
   constructor(props) {
     super(props)
@@ -36,23 +56,34 @@ class ViewInventory extends Component {
       inventoryProductsAndCounts: [],
       filter: 'all',
       gridHeight: 1000,
-      el: null
     }
-    this.dataAdapter = new DataAdapter()
+
+    this.dataAdapter = DataAdapter
     this.fetchData = this.fetchData.bind(this)
+
     this.columns = (screenIsSmall) => {
-      let columns = [
-        { key: 'upc', name: 'UPC', width: 120, sortable: true }
+      const columns = [
+        {
+          key: 'upc', name: 'UPC', width: 120, sortable: true,
+        },
       ]
 
       if (!screenIsSmall) {
-        columns.push({ key: 'brand', name: 'Brand', width: 120, sortable: true })
-        columns.push({ key: 'type', name: 'Type', width: 80, sortable: true })
+        columns.push({
+          key: 'brand', name: 'Brand', width: 120, sortable: true,
+        })
+        columns.push({
+          key: 'type', name: 'Type', width: 80, sortable: true,
+        })
         columns.push({ key: 'description', name: 'Description', sortable: true })
       }
 
-      columns.push({ key: 'report_qty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right' })
-      columns.push({ key: 'manual_qty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true })
+      columns.push({
+        key: 'report_qty', name: 'Report Qty', sortable: true, width: 80, cellClass: 'text-right',
+      })
+      columns.push({
+        key: 'manual_qty', name: 'Scan Qty', sortable: true, width: 80, cellClass: 'text-right', editable: true,
+      })
 
       return columns
     }
@@ -67,16 +98,17 @@ class ViewInventory extends Component {
     const { match: { params: { inventoryId } } } = this.props
     const { filter: prevFilter } = prevState
     const { filter } = this.state
-    if (inventoryId && (inventoryId !== previousInventoryId || filter !== prevFilter ))  {
+    if (inventoryId && (inventoryId !== previousInventoryId || filter !== prevFilter)) {
       this.fetchData()
     }
   }
 
   async fetchData() {
     const { match: { params: { inventoryId } } } = this.props
-    const { filter }  = this.state
+    const { filter } = this.state
     this.setState({
-      inventoryProductsAndCounts: await this.dataAdapter.getInventoryProductsAndCounts(parseInt(inventoryId.toString(), 10), filter)
+      inventoryProductsAndCounts: await this.dataAdapter
+        .getInventoryProductsAndCounts(parseInt(inventoryId.toString(), 10), filter),
     })
   }
 
@@ -99,15 +131,18 @@ class ViewInventory extends Component {
 
   handleGridRowsUpdated = async ({ fromRow, toRow, updated }) => {
     const inventoryProductsAndCounts = this.state.inventoryProductsAndCounts.slice()
+    const updatedCopy = Object.assign({}, updated)
 
-    if (typeof updated === 'object' && typeof updated.manual_qty === 'string') {
-      updated.manual_qty = parseInt(updated.manual_qty, 10)
+    if (typeof updatedCopy === 'object' && typeof updatedCopy.manual_qty === 'string') {
+      updatedCopy.manual_qty = parseInt(updatedCopy.manual_qty, 10)
     }
 
-    for (let i = fromRow; i <= toRow; i++) {
-      let { inventory_id, upc } = inventoryProductsAndCounts[i]
-      await this.dataAdapter.updateCount(upc, inventory_id, updated.manual_qty)
+    const promises = []
+    for (let i = fromRow; i <= toRow; i += 1) {
+      const { inventory_id: inventoryId, upc } = inventoryProductsAndCounts[i]
+      promises.push(this.dataAdapter.updateCount(upc, inventoryId, updatedCopy.manual_qty))
     }
+    await Promise.all(promises)
 
     this.fetchData()
   }
@@ -117,11 +152,9 @@ class ViewInventory extends Component {
   }
 
   captureEl = (el) => {
-    this.setState({ el }, () => {
+    this.measureHeight(el)
+    el.addEventListener('resize', () => {
       this.measureHeight(el)
-      el.addEventListener('resize', () => {
-        this.measureHeight(el)
-      })
     })
   }
 
@@ -140,7 +173,7 @@ class ViewInventory extends Component {
           <div className="max-height" ref={this.measureHeight}>
             <Navbar light color="inverse" className={`${screenIsSmall && 'justify-content-between'}`}>
               <Nav className="bottom-nav">
-                { !screenIsSmall && <p style={{color:'white'}}>Filter:</p> }
+                { !screenIsSmall && <p style={{ color: 'white' }}>Filter:</p> }
                 <ButtonGroup>
                   <FilterButton screenIsSmall={screenIsSmall} color="secondary" size="sm" active={filter === 'all'} onClick={this.handleFilter} filterValue="all">All</FilterButton>
                   <FilterButton screenIsSmall={screenIsSmall} color="warning" size="sm" active={filter === 'over'} onClick={this.handleFilter} filterValue="over">Over</FilterButton>
@@ -156,21 +189,21 @@ class ViewInventory extends Component {
                 rowsCount={inventoryProductsAndCounts.length}
                 minHeight={gridHeight}
                 onGridSort={this.handleGridSort}
-                enableCellSelect={true}
+                enableCellSelect
                 onGridRowsUpdated={this.handleGridRowsUpdated}
               />
             }
 
             <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
               <Nav className="bottom-nav">
-                <Link to="/">
-                  <Button color="secondary" size="md"><i className="fas fa-home"></i> Home</Button>
+                <Link to="/auth">
+                  <Button color="secondary" size="md"><i className="fas fa-home" /> Home</Button>
                 </Link>
-                <Link to={`/scan/${inventoryId}`}>
-                  <Button color="primary" size="md"><i className="fas fa-barcode"></i> Scan</Button>
+                <Link to={`/auth/scan/${inventoryId}`}>
+                  <Button color="primary" size="md"><i className="fas fa-barcode" /> Scan</Button>
                 </Link>
-                <Link to="/">
-                  <Button color="success" size="md"><i className="fas fa-check-square"></i> Done</Button>
+                <Link to="/auth">
+                  <Button color="success" size="md"><i className="fas fa-check-square" /> Done</Button>
                 </Link>
               </Nav>
             </Navbar>
@@ -182,13 +215,15 @@ class ViewInventory extends Component {
 }
 
 ViewInventory.propTypes = {
-  inventoryId: PropTypes.number,
-  match: PropTypes.object
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      inventoryId: PropTypes.number,
+    }),
+  }),
 }
 
 ViewInventory.defaultProps = {
-  inventoryId: null,
-  match: null
+  match: null,
 }
 
 export default ViewInventory

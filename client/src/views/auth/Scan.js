@@ -1,30 +1,18 @@
 import React, { Component } from 'react'
-// import PropTypes from 'prop-types'
-import Quagga from 'quagga'
-import Scanner from '../components/Scanner'
-import DataAdapter from '../dataAdapters/JsonApi'
+import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Navbar, Nav, Button } from 'reactstrap'
-import Beep from  'browser-beep'
-
-const beep = Beep({ frequency: 830 })
-const boop = Beep({ frequency: 315 })
+import Scanner from '../../components/Scanner'
+import DataAdapter from '../../dataAdapters/JsonApi'
 
 class Scan extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      scanning: true,
-      scanResults: [],
       scannedItem: false,
-      scanReady: false,
-      failedCode: null
+      failedCode: null,
     }
-    this.dataAdapter = new DataAdapter()
-  }
-
-  componentDidMount() {
-    this.setState({ scanReady: true });
+    this.dataAdapter = DataAdapter
   }
 
   validateItem = (item) => {
@@ -33,71 +21,58 @@ class Scan extends Component {
     return true
   }
 
-  handleDetected = async (result) => {
+  handleDetected = async (result, makeReadyForTheNextOne) => {
     let {
       match: {
         params: {
-          inventoryId
-        }
+          inventoryId,
+        },
       },
     } = this.props
 
     inventoryId = parseInt(inventoryId.toString(), 10)
 
-    Quagga.pause()
-    this.setState({ scanReady: false })
-    let productAndCount = await this.dataAdapter.getProductAndCountByUPC(result.codeResult.code, inventoryId)
+    let productAndCount = await this.dataAdapter.getProductAndCountByUPC(result, inventoryId)
     const isValid = this.validateItem(productAndCount)
     if (isValid) {
-      beep(1)
       this.setState({ scannedItem: productAndCount, failedCode: null }, async () => {
-        await this.dataAdapter.updateCount(productAndCount.upc, inventoryId, (parseInt(productAndCount.manual_qty.toString(), 10) + 1))
-        productAndCount = await this.dataAdapter.getProductAndCountByUPC(productAndCount.upc, inventoryId)
-        this.setState({ scannedItem: productAndCount })
+        await this.dataAdapter.updateCount(
+          productAndCount.upc,
+          inventoryId,
+          (parseInt(productAndCount.manual_qty.toString(), 10) + 1),
+        )
+
+        productAndCount = await this.dataAdapter
+          .getProductAndCountByUPC(productAndCount.upc, inventoryId)
+
+        this.setState({ scannedItem: productAndCount }, () => {
+          makeReadyForTheNextOne()
+        })
       })
     } else {
-      boop(2)
-      this.setState({ scannedItem: false, failedCode: result.codeResult.code })
+      this.setState({ scannedItem: false, failedCode: result }, () => {
+        makeReadyForTheNextOne()
+      })
     }
-
-    setTimeout(() => {
-      Quagga.start()
-      this.setState({ scanReady: true })
-    }, 5000)
   }
 
   render() {
     const {
       match: {
         params: {
-          inventoryId
-        }
+          inventoryId,
+        },
       },
     } = this.props
 
     const {
       scannedItem,
-      scanning,
-      scanReady,
-      failedCode
+      failedCode,
     } = this.state
-
-    const ledStyle = {
-      borderRadius: '50%',
-      height: 15,
-      width: 15,
-      position: 'absolute',
-      backgroundColor: scanReady ? 'lightgreen' : 'lightsalmon',
-      marginLeft: 10,
-      marginTop: 30
-    }
 
     return (
       <div>
-        <div className="scanner-container">
-          <div style={ledStyle}>&nbsp;</div>
-          {scanning ? <Scanner onDetected={this.handleDetected}/> : null}
-        </div>
+        <Scanner onDetected={this.handleDetected} />
         <div className="padded">
           { scannedItem ? (
             <div className="container">
@@ -129,17 +104,17 @@ class Scan extends Component {
           ) : (
             <div>
               { failedCode
-                ? <i className="text-center" style={{ display: 'block' }}>Couldn't find a product for <b>{failedCode}</b></i>
-                : <i className="text-center" style={{ display: 'block' }}>Scan a barcode to get started.</i>
+                && <i className="text-center" style={{ display: 'block' }}>Couldn&apos;t find a product for <b>{failedCode}</b></i>
               }
+              <i className="text-center" style={{ display: 'block' }}>Type or paste a barcode and press <b>[Enter]</b>.</i>
             </div>
           )
-        }
+          }
         </div>
         <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
-            <Link to={`/inventory/${inventoryId}`}>
-              <Button color="secondary" size="md"><i className="fas fa-th-list"></i> Back to List</Button>
+            <Link to={`/auth/inventory/${inventoryId}`}>
+              <Button color="secondary" size="md"><i className="fas fa-th-list" /> Back to List</Button>
             </Link>
           </Nav>
         </Navbar>
@@ -149,11 +124,15 @@ class Scan extends Component {
 }
 
 Scan.propTypes = {
-
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      inventoryId: PropTypes.number,
+    }),
+  }),
 }
 
 Scan.defaultProps = {
-
+  match: {},
 }
 
 export default Scan

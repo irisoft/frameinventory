@@ -3,24 +3,24 @@ import PropTypes from 'prop-types'
 import { Container, Row, Col } from 'reactstrap'
 
 
-function Home(props) {
+function About(props) {
   return (
     <Container>
       <Row>
         <Col>
-          <h1 className="page-title">Home</h1>
+          <h1 className="page-title">About</h1>
         </Col>
       </Row>
     </Container>
   )
 }
 
-Home.propTypes = {
+About.propTypes = {
 
 }
 
-Home.defaultProps = {
+About.defaultProps = {
 
 }
 
-export default Home
+export default About

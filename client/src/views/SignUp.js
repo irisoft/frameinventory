@@ -3,24 +3,24 @@ import PropTypes from 'prop-types'
 import { Container, Row, Col } from 'reactstrap'
 
 
-function Home(props) {
+function SignUp(props) {
   return (
     <Container>
       <Row>
         <Col>
-          <h1 className="page-title">Home</h1>
+          <h1 className="page-title">Sign Up</h1>
         </Col>
       </Row>
     </Container>
   )
 }
 
-Home.propTypes = {
+SignUp.propTypes = {
 
 }
 
-Home.defaultProps = {
+SignUp.defaultProps = {
 
 }
 
-export default Home
+export default SignUp

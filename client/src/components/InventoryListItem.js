@@ -3,12 +3,14 @@ import PropTypes from 'prop-types'
 import { ListGroupItem, Badge } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
-function InventoryListItem({ id, title, description, overCount, underCount }) {
+function InventoryListItem({
+  id, title, overCount, underCount,
+}) {
   const overColor = overCount === 0 ? 'success' : 'warning'
   const underColor = underCount === 0 ? 'success' : 'danger'
 
   return (
-    <Link to={`/inventory/${id}`} >
+    <Link to={`/auth/inventory/${id}`} >
       <ListGroupItem className="justify-content-between">
         <button className="btn btn-sm btn-success">View</button>
         {title}
@@ -23,17 +25,17 @@ function InventoryListItem({ id, title, description, overCount, underCount }) {
 }
 
 InventoryListItem.propTypes = {
+  id: PropTypes.number,
   title: PropTypes.string,
-  description: PropTypes.string,
   overCount: PropTypes.number,
-  underCount: PropTypes.number
+  underCount: PropTypes.number,
 }
 
 InventoryListItem.defaultProps = {
+  id: null,
   title: null,
-  description: null,
   overCount: 0,
-  underCount: 0
+  underCount: 0,
 }
 
 export default InventoryListItem

@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "4.0.0-alpha.6",
+    "@okta/okta-react": "^0.0.12",
+    "@okta/okta-signin-widget": "^2.7.0",
+    "bootstrap": "^4.0.0",
     "browser-beep": "^1.0.2",
     "dexie": "^2.0.1",
     "prop-types": "^15.6.0",
@@ -15,9 +17,17 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "react-transition-group": "^2.2.1",
-    "reactstrap": "^5.0.0-alpha.4",
+    "reactstrap": "5.0.0-beta.2",
     "request-json": "^0.6.3",
     "xlsx": "^0.11.18"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0"
   },
   "scripts": {
     "start": "react-scripts start",
