@@ -2,6 +2,7 @@ const restify = require('restify')
 const errors = require('restify-errors')
 const { Pool } = require('pg')
 const corsMiddleware = require('restify-cors-middleware')
+const OktaJwtVerifier = require('@okta/jwt-verifier')
 
 const PORT = process.env.PORT || 8080
 
@@ -17,6 +18,18 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: true
 })
+
+const oktaJwtVerifier = new OktaJwtVerifier({
+  issuer: 'https://dev-924982.oktapreview.com/oauth2/default',
+  assertClaims: {
+    aud: "api://default",
+    cid: "0oaecgijbzWW1fNFC0h7"
+  }
+})
+
+const noAuthRequired = [
+  'createOrganization'
+]
 
 async function queryDB({ text, values, name }, expectRows = true, forceArray = false) {
   const { rows, rowCount } = await pool.query({
@@ -52,6 +65,32 @@ server.use(cors.actual)
 server.use(restify.plugins.gzipResponse())
 server.use(restify.plugins.bodyParser({ mapParams: true }))
 server.use(restify.plugins.queryParser())
+
+
+server.use((req, res, next) => {
+  const { name: routeName } = req.getRoute()
+
+  if (noAuthRequired.indexOf(routeName) > -1) return next()
+  
+  const authHeader = req.headers.authorization || ''
+  const match = authHeader.match(/Bearer (.+)/)
+
+  if (!match) {
+    return next(new errors.UnauthorizedError())
+  }
+
+  const accessToken = match[1]
+
+  return oktaJwtVerifier.verifyAccessToken(accessToken)
+    .then((jwt) => {
+      req.jwt = jwt
+      return next()
+    })
+    .catch((err) => {
+      return next(new errors.UnauthorizedError())
+    })
+})
+
 
 // require and init
 function requireAndInit(handlers) {

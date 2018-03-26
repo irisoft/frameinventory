@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Navbar, Nav, Button } from 'reactstrap'
 import Scanner from '../../components/Scanner'
-import DataAdapter from '../../dataAdapters/JsonApi'
 
 class Scan extends Component {
   constructor(props) {
@@ -12,7 +11,6 @@ class Scan extends Component {
       scannedItem: false,
       failedCode: null,
     }
-    this.dataAdapter = DataAdapter
   }
 
   validateItem = (item) => {
@@ -22,6 +20,8 @@ class Scan extends Component {
   }
 
   handleDetected = async (result, makeReadyForTheNextOne) => {
+    const { api } = this.props
+
     let {
       match: {
         params: {
@@ -32,17 +32,17 @@ class Scan extends Component {
 
     inventoryId = parseInt(inventoryId.toString(), 10)
 
-    let productAndCount = await this.dataAdapter.getProductAndCountByUPC(result, inventoryId)
+    let productAndCount = await api.getProductAndCountByUPC(result, inventoryId)
     const isValid = this.validateItem(productAndCount)
     if (isValid) {
       this.setState({ scannedItem: productAndCount, failedCode: null }, async () => {
-        await this.dataAdapter.updateCount(
+        await api.updateCount(
           productAndCount.upc,
           inventoryId,
           (parseInt(productAndCount.manual_qty.toString(), 10) + 1),
         )
 
-        productAndCount = await this.dataAdapter
+        productAndCount = await api
           .getProductAndCountByUPC(productAndCount.upc, inventoryId)
 
         this.setState({ scannedItem: productAndCount }, () => {
@@ -124,14 +124,16 @@ class Scan extends Component {
 }
 
 Scan.propTypes = {
+  api: PropTypes.shape({}),
   match: PropTypes.shape({
     params: PropTypes.shape({
-      inventoryId: PropTypes.number,
+      inventoryId: PropTypes.string,
     }),
   }),
 }
 
 Scan.defaultProps = {
+  api: {},
   match: {},
 }
 

@@ -2,9 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Navbar, Nav, Button, ListGroup, Container, Row, Col } from 'reactstrap'
 import { Link } from 'react-router-dom'
-import { withAuth } from '@okta/okta-react'
 import InventoryListItem from '../../components/InventoryListItem'
-import DataAdapter from '../../dataAdapters/JsonApi'
 
 class ListInventories extends Component {
   constructor(props) {
@@ -12,16 +10,12 @@ class ListInventories extends Component {
 
     this.state = {
       inventories: [],
-      authenticated: null,
     }
-
-    this.checkAuthentication = this.checkAuthentication.bind(this)
-    this.checkAuthentication()
-    this.dataAdapter = DataAdapter
   }
 
   async componentDidMount() {
-    this.setState({ inventories: await this.dataAdapter.getAllInventories() })
+    const { api } = this.props
+    this.setState({ inventories: await api.getAllInventories() })
   }
 
   componentDidUpdate() {
@@ -93,10 +87,12 @@ ListInventories.propTypes = {
     login: PropTypes.func,
     isAuthenticated: PropTypes.func,
   }),
+  api: PropTypes.shape({}),
 }
 
 ListInventories.defaultProps = {
   auth: null,
+  api: null,
 }
 
-export default withAuth(ListInventories)
+export default ListInventories

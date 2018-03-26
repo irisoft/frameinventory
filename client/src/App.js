@@ -10,6 +10,7 @@ const config = {
   issuer: 'https://dev-924982.oktapreview.com/oauth2/default',
   redirect_uri: `${window.location.origin}/implicit/callback`,
   client_id: '0oaecgijbzWW1fNFC0h7',
+  scope: ['openid', 'groups', 'email', 'profile'],
 }
 
 function onAuthRequired({ history }) {
@@ -24,6 +25,7 @@ function App() {
         client_id={config.client_id}
         redirect_uri={config.redirect_uri}
         onAuthRequired={onAuthRequired}
+        scope={config.scope}
       >
         <TopNavBar />
         <NoAuthContainer />

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
 import { Navbar, Nav, Button } from 'reactstrap'
 import XLSX from 'xlsx'
-import DataAdapter from '../../dataAdapters/JsonApi'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -13,8 +13,6 @@ class UploadReport extends Component {
       readyToRedirect: false,
       inventoryId: null,
     }
-
-    this.dataAdapter = DataAdapter
   }
 
   onChange = (e) => {
@@ -25,6 +23,7 @@ class UploadReport extends Component {
     e.preventDefault()
 
     const { file } = this.state
+    const { api } = this.props
     const reader = new FileReader()
 
     reader.onload = (loadEvent) => {
@@ -34,7 +33,7 @@ class UploadReport extends Component {
 
       const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
 
-      this.dataAdapter.createNewInventory().then(async ({ id: inventoryId }) => {
+      api.createNewInventory().then(async ({ id: inventoryId }) => {
         const products = []
 
         json.forEach((row) => {
@@ -51,7 +50,7 @@ class UploadReport extends Component {
           products.push(product)
         })
 
-        await this.dataAdapter.insertProducts(inventoryId, products)
+        await api.insertProducts(inventoryId, products)
         this.setState({ readyToRedirect: true, inventoryId })
       })
     }
@@ -88,11 +87,17 @@ class UploadReport extends Component {
 }
 
 UploadReport.propTypes = {
-
+  auth: PropTypes.shape({
+    logout: PropTypes.func,
+    login: PropTypes.func,
+    isAuthenticated: PropTypes.func,
+  }),
+  api: PropTypes.shape({}),
 }
 
 UploadReport.defaultProps = {
-
+  auth: null,
+  api: null,
 }
 
 export default UploadReport

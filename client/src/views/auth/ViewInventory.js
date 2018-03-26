@@ -4,7 +4,6 @@ import ReactDataGrid from 'react-data-grid'
 import { Link } from 'react-router-dom'
 import Media from 'react-media'
 import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
-import DataAdapter from '../../dataAdapters/JsonApi'
 
 const FilterButton = ({
   active, size, children, filterValue, onClick, screenIsSmall,
@@ -33,7 +32,7 @@ const FilterButton = ({
 
 FilterButton.propTypes = {
   active: PropTypes.bool,
-  size: PropTypes.number,
+  size: PropTypes.string,
   children: PropTypes.node,
   filterValue: PropTypes.string,
   onClick: PropTypes.func,
@@ -58,7 +57,6 @@ class ViewInventory extends Component {
       gridHeight: 1000,
     }
 
-    this.dataAdapter = DataAdapter
     this.fetchData = this.fetchData.bind(this)
 
     this.columns = (screenIsSmall) => {
@@ -104,10 +102,10 @@ class ViewInventory extends Component {
   }
 
   async fetchData() {
-    const { match: { params: { inventoryId } } } = this.props
+    const { api, match: { params: { inventoryId } } } = this.props
     const { filter } = this.state
     this.setState({
-      inventoryProductsAndCounts: await this.dataAdapter
+      inventoryProductsAndCounts: await api
         .getInventoryProductsAndCounts(parseInt(inventoryId.toString(), 10), filter),
     })
   }
@@ -132,6 +130,7 @@ class ViewInventory extends Component {
   handleGridRowsUpdated = async ({ fromRow, toRow, updated }) => {
     const inventoryProductsAndCounts = this.state.inventoryProductsAndCounts.slice()
     const updatedCopy = Object.assign({}, updated)
+    const { api } = this.props
 
     if (typeof updatedCopy === 'object' && typeof updatedCopy.manual_qty === 'string') {
       updatedCopy.manual_qty = parseInt(updatedCopy.manual_qty, 10)
@@ -140,7 +139,7 @@ class ViewInventory extends Component {
     const promises = []
     for (let i = fromRow; i <= toRow; i += 1) {
       const { inventory_id: inventoryId, upc } = inventoryProductsAndCounts[i]
-      promises.push(this.dataAdapter.updateCount(upc, inventoryId, updatedCopy.manual_qty))
+      promises.push(api.updateCount(upc, inventoryId, updatedCopy.manual_qty))
     }
     await Promise.all(promises)
 
@@ -217,7 +216,7 @@ class ViewInventory extends Component {
 ViewInventory.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
-      inventoryId: PropTypes.number,
+      inventoryId: PropTypes.string,
     }),
   }),
 }

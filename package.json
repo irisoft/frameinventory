@@ -13,6 +13,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@okta/jwt-verifier": "^0.0.11",
+    "@okta/okta-sdk-nodejs": "^1.1.0",
     "concurrently": "^3.5.1",
     "pg": "^7.4.1",
     "restify": "^6.3.4",
