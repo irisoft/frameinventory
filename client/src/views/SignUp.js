@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 // import PropTypes from 'prop-types'
-import { Container, Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap'
+// import { Row, Col, Button, Form, FormGroup, Label, Input } from 'reactstrap'
+import Container from '../components/Container'
 import withAPI from '../dataAdapters/withAPI'
 
 class SignUp extends Component {
@@ -35,44 +36,44 @@ class SignUp extends Component {
   render() {
     return (
       <Container>
-        <Row>
-          <Col>
-            <h1 className="page-title">Sign Up</h1>
-            <Form onSubmit={this.handleSubmit}>
+        <div>
+          <div>
+            <h1 className="f3">Sign Up</h1>
+            {/* <Form onSubmit={this.handleSubmit}>
               <FormGroup row>
                 <Label for="email" sm={2}>Email</Label>
-                <Col sm={10}>
+                <div sm={10}>
                   <Input onChange={this.handleChange} value={this.state.email} type="email" name="email" id="email" placeholder="with a placeholder" />
-                </Col>
+                </div>
               </FormGroup>
               <FormGroup row>
                 <Label for="password" sm={2}>Password</Label>
-                <Col sm={10}>
+                <div sm={10}>
                   <Input onChange={this.handleChange} value={this.state.password} type="password" name="password" id="password" placeholder="password placeholder" />
-                </Col>
+                </div>
               </FormGroup>
               <FormGroup row>
                 <Label for="orgName" sm={2}>Text Area</Label>
-                <Col sm={10}>
+                <div sm={10}>
                   <Input onChange={this.handleChange} value={this.state.orgName} type="textarea" name="orgName" id="orgName" />
-                </Col>
+                </div>
               </FormGroup>
               <FormGroup row>
                 <Label for="firstName" sm={2}>Text Area</Label>
-                <Col sm={10}>
+                <div sm={10}>
                   <Input onChange={this.handleChange} value={this.state.firstName} type="textarea" name="firstName" id="firstName" />
-                </Col>
+                </div>
               </FormGroup>
               <FormGroup row>
                 <Label for="lastName" sm={2}>Text Area</Label>
-                <Col sm={10}>
+                <div sm={10}>
                   <Input onChange={this.handleChange} value={this.state.lastName} type="textarea" name="lastName" id="lastName" />
-                </Col>
+                </div>
               </FormGroup>
               <Button id="submit" type="submit">Submit</Button>
-            </Form>
-          </Col>
-        </Row>
+            </Form> */}
+          </div>
+        </div>
       </Container>
     )
   }

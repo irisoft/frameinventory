@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
-import { Navbar, Nav, Button } from 'reactstrap'
+// import { Link } from 'react-router-dom'
+// import { Navbar, Nav, Button } from 'reactstrap'
 import Scanner from '../../components/Scanner'
+import PageHeading from '../../components/PageHeading'
+import Container from '../../components/Container'
 
 class Scan extends Component {
   constructor(props) {
@@ -57,13 +59,13 @@ class Scan extends Component {
   }
 
   render() {
-    const {
-      match: {
-        params: {
-          inventoryId,
-        },
-      },
-    } = this.props
+    // const {
+    //   match: {
+    //     params: {
+    //       inventoryId,
+    //     },
+    //   },
+    // } = this.props
 
     const {
       scannedItem,
@@ -71,7 +73,8 @@ class Scan extends Component {
     } = this.state
 
     return (
-      <div>
+      <Container>
+        <PageHeading>Scan</PageHeading>
         <Scanner onDetected={this.handleDetected} />
         <div className="padded">
           { scannedItem ? (
@@ -111,14 +114,14 @@ class Scan extends Component {
           )
           }
         </div>
-        <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
+        {/* <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/auth/inventory/${inventoryId}`}>
               <Button color="secondary" size="md"><i className="fas fa-th-list" /> Back to List</Button>
             </Link>
           </Nav>
-        </Navbar>
-      </div>
+        </Navbar> */}
+      </Container>
     )
   }
 }

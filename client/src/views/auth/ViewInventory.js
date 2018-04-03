@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import ReactDataGrid from 'react-data-grid'
 import { Link } from 'react-router-dom'
 import Media from 'react-media'
-import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
+// import { Navbar, Nav, Button, ButtonGroup } from 'reactstrap'
 
 const FilterButton = ({
   active, size, children, filterValue, onClick, screenIsSmall,
@@ -14,19 +14,19 @@ const FilterButton = ({
     style.width = 120
   }
 
-  return (
-    <Button
-      style={style}
-      active={active}
-      size={size}
-      onClick={() => {
-        if (typeof onClick === 'function') {
-          onClick(filterValue)
-        }
-      }}
-    >
-      {children}
-    </Button>
+  return (null
+  // <Button
+  //   style={style}
+  //   active={active}
+  //   size={size}
+  //   onClick={() => {
+  //     if (typeof onClick === 'function') {
+  //       onClick(filterValue)
+  //     }
+  //   }}
+  // >
+  //   {children}
+  // </Button>
   )
 }
 
@@ -170,7 +170,7 @@ class ViewInventory extends Component {
       <Media query="(max-width: 599px)">
         {screenIsSmall => (
           <div className="max-height" ref={this.measureHeight}>
-            <Navbar light color="inverse" className={`${screenIsSmall && 'justify-content-between'}`}>
+            {/* <Navbar light color="inverse" className={`${screenIsSmall && 'justify-content-between'}`}>
               <Nav className="bottom-nav">
                 { !screenIsSmall && <p style={{ color: 'white' }}>Filter:</p> }
                 <ButtonGroup>
@@ -180,7 +180,7 @@ class ViewInventory extends Component {
                   <FilterButton screenIsSmall={screenIsSmall} color="success" size="sm" active={filter === 'even'} onClick={this.handleFilter} filterValue="even">Even</FilterButton>
                 </ButtonGroup>
               </Nav>
-            </Navbar>
+            </Navbar> */}
             {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
               <ReactDataGrid
                 columns={this.columns(screenIsSmall)}
@@ -193,7 +193,7 @@ class ViewInventory extends Component {
               />
             }
 
-            <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
+            {/* <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
               <Nav className="bottom-nav">
                 <Link to="/auth">
                   <Button color="secondary" size="md"><i className="fas fa-home" /> Home</Button>
@@ -205,7 +205,7 @@ class ViewInventory extends Component {
                   <Button color="success" size="md"><i className="fas fa-check-square" /> Done</Button>
                 </Link>
               </Nav>
-            </Navbar>
+            </Navbar> */}
           </div>
         )}
       </Media>

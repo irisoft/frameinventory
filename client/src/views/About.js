@@ -1,16 +1,12 @@
 import React from 'react'
 // import PropTypes from 'prop-types'
-import { Container, Row, Col } from 'reactstrap'
-
+// import { Row, Col } from 'reactstrap'
+import Container from '../components/Container'
 
 function About(props) {
   return (
     <Container>
-      <Row>
-        <Col>
-          <h1 className="page-title">About</h1>
-        </Col>
-      </Row>
+      <h1 className="f3">About</h1>
     </Container>
   )
 }

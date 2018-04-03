@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Navbar, NavbarBrand, Nav, NavItem, NavLink, NavbarToggler, Collapse } from 'reactstrap'
+// import { Navbar, NavbarBrand, Nav, NavItem, NavLink, NavbarToggler, Collapse } from 'reactstrap'
 import { withAuth } from '@okta/okta-react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/company-logo-white.png'
@@ -33,34 +33,46 @@ class TopNavBar extends Component {
 
   render() {
     return (
-      <Navbar color="dark" fixed="top" light expand="md">
-        <NavbarBrand>
+      <header className="fixed w-100 top-0">
+        <nav className="w-100 pa3 flex items-center justify-between bg-dark-gray">
           <img alt="Irisoft Logo" height={18} src={logo} />
-        </NavbarBrand>
-        <NavbarToggler onClick={this.toggleNavbar} />
-        <Collapse isOpen={this.state.isOpen} navbar>
-          <Nav navbar className="mr-auto">
-            <NavItem>
-              <NavLink tag={Link} to="/">Home</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} to="/about">About</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} to="/sign-up">Register</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} to="/auth/">Inventory</NavLink>
-            </NavItem>
-          </Nav>
-          <span className="navbar-text">
+          <div className="tr">
+            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/">Home</Link>
+            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/about">About</Link>
+            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/sign-up">Register</Link>
+            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/auth/">Inventory</Link>
             { this.state.authenticated
               ? <button className="btn btn-default" onClick={this.props.auth.logout}>Logout</button>
               : <button className="btn btn-default" onClick={this.props.auth.login}>Login</button>
             }
-          </span>
-        </Collapse>
-      </Navbar>
+          </div>
+        </nav>
+      </header>
+      // <Navbar color="dark" fixed="top" light expand="md">
+      //   <NavbarBrand>
+      //
+      //   </NavbarBrand>
+      //   <NavbarToggler onClick={this.toggleNavbar} />
+      //   <Collapse isOpen={this.state.isOpen} navbar>
+      //     <Nav navbar className="mr-auto">
+      //       <NavItem>
+      //         <NavLink tag={Link} to="/">Home</NavLink>
+      //       </NavItem>
+      //       <NavItem>
+      //
+      //       </NavItem>
+      //       <NavItem>
+      //
+      //       </NavItem>
+      //       <NavItem>
+      //
+      //       </NavItem>
+      //     </Nav>
+      //     <span className="navbar-text">
+
+      //     </span>
+      //   </Collapse>
+      // </Navbar>
     )
   }
 }

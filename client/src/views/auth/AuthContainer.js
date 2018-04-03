@@ -11,8 +11,8 @@ function AuthContainer(props) {
   const { auth, api, authenticated } = props
   return (
     <div>
-      <Route exact path="/auth/" render={componentProps => (<ListInventories {...componentProps} auth={auth} authenticated={authenticated} api={api} />)} />
-      <Route path="/auth/upload" render={componentProps => (<UploadReport {...componentProps} auth={auth} authenticated={authenticated} api={api} />)} />
+      <Route exact path="/auth/" render={componentProps => (<UploadReport {...componentProps} auth={auth} authenticated={authenticated} api={api} />)} />
+      <Route path="/auth/list" render={componentProps => (<ListInventories {...componentProps} auth={auth} authenticated={authenticated} api={api} />)} />
       <Route path="/auth/inventory/:inventoryId" render={componentProps => (<ViewInventory {...componentProps} auth={auth} authenticated={authenticated} api={api} />)} />
       <Route path="/auth/scan/:inventoryId" render={componentProps => (<Scan {...componentProps} auth={auth} authenticated={authenticated} api={api} />)} />
     </div>
