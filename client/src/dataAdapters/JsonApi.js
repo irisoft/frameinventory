@@ -67,6 +67,12 @@ const apiMethods = {
     }
   ),
 
+  createOrganization: () => (
+    {
+      path: '/organization',
+      method: 'post',
+    }
+  ),
 
   /* PRODUCT METHODS */
 
@@ -78,13 +84,17 @@ const apiMethods = {
   ),
 }
 
-function makeApiCall(name, pathParams, payload) {
+export function makeApiCall(name, pathParams, payload, token = false) {
   return new Promise((resolve, reject) => {
     const { path, method } = apiMethods[name](pathParams)
 
     const handleResponse = (err, res, body) => {
       if (err) return reject(err)
       return resolve(body)
+    }
+
+    if (token) {
+      client.headers.Authorization = `Bearer ${token}`
     }
 
     if (['get', 'head', 'del'].includes(method)) {
@@ -97,9 +107,9 @@ function makeApiCall(name, pathParams, payload) {
   })
 }
 
-const JsonApi = {
+const JsonApi = token => ({
   createNewInventory: async () => {
-    const result = await makeApiCall('createInventory', { organizationId: 1 })
+    const result = await makeApiCall('createInventory', { organizationId: 1 }, null, token)
     return result
   },
 
@@ -108,12 +118,12 @@ const JsonApi = {
       organizationId: 1,
       inventoryId,
       upc,
-    }, { manualQty })
+    }, { manualQty }, token)
     return result
   },
 
   getAllInventories: async () => {
-    const result = await makeApiCall('getInventory', { organizationId: 1 })
+    const result = await makeApiCall('getInventory', { organizationId: 1 }, null, token)
     return result
   },
 
@@ -121,7 +131,18 @@ const JsonApi = {
     const result = await makeApiCall('uploadProductsAndCounts', {
       organizationId: 1,
       inventoryId,
-    }, { products })
+    }, { products }, token)
+    return result
+  },
+
+  createOrganization: async (orgName, firstName, lastName, email, password) => {
+    const result = await makeApiCall('createOrganization', null, {
+      orgName,
+      firstName,
+      lastName,
+      email,
+      password,
+    }, token)
     return result
   },
 
@@ -133,6 +154,8 @@ const JsonApi = {
         inventoryId,
         upc,
       },
+      null,
+      token,
     )
     return result
   },
@@ -145,9 +168,11 @@ const JsonApi = {
         inventoryId,
         filter,
       },
+      null,
+      token,
     )
     return result
   },
-}
+})
 
 export default JsonApi

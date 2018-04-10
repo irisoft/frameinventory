@@ -1,16 +1,16 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Container, Row, Col } from 'reactstrap'
+// import PropTypes from 'prop-types'
+// import { div, Row, Col } from 'reactstrap'
+import Container from '../components/Container'
 
-
-function Home(props) {
+function Home() {
   return (
     <Container>
-      <Row>
-        <Col>
-          <h1 className="page-title">Home</h1>
-        </Col>
-      </Row>
+      <div>
+        <div>
+          <h1 className="f3">Home</h1>
+        </div>
+      </div>
     </Container>
   )
 }

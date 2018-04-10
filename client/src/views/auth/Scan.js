@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
-import { Navbar, Nav, Button } from 'reactstrap'
+// import { Link } from 'react-router-dom'
+// import { Navbar, Nav, Button } from 'reactstrap'
 import Scanner from '../../components/Scanner'
-import DataAdapter from '../../dataAdapters/JsonApi'
+import PageHeading from '../../components/PageHeading'
+import Container from '../../components/Container'
+import RoundButton from '../../components/RoundButton'
 
 class Scan extends Component {
   constructor(props) {
@@ -12,7 +14,6 @@ class Scan extends Component {
       scannedItem: false,
       failedCode: null,
     }
-    this.dataAdapter = DataAdapter
   }
 
   validateItem = (item) => {
@@ -22,6 +23,8 @@ class Scan extends Component {
   }
 
   handleDetected = async (result, makeReadyForTheNextOne) => {
+    const { api } = this.props
+
     let {
       match: {
         params: {
@@ -32,17 +35,17 @@ class Scan extends Component {
 
     inventoryId = parseInt(inventoryId.toString(), 10)
 
-    let productAndCount = await this.dataAdapter.getProductAndCountByUPC(result, inventoryId)
+    let productAndCount = await api.getProductAndCountByUPC(result, inventoryId)
     const isValid = this.validateItem(productAndCount)
     if (isValid) {
       this.setState({ scannedItem: productAndCount, failedCode: null }, async () => {
-        await this.dataAdapter.updateCount(
+        await api.updateCount(
           productAndCount.upc,
           inventoryId,
           (parseInt(productAndCount.manual_qty.toString(), 10) + 1),
         )
 
-        productAndCount = await this.dataAdapter
+        productAndCount = await api
           .getProductAndCountByUPC(productAndCount.upc, inventoryId)
 
         this.setState({ scannedItem: productAndCount }, () => {
@@ -71,7 +74,12 @@ class Scan extends Component {
     } = this.state
 
     return (
-      <div>
+      <Container>
+        <RoundButton
+          label="< Back"
+          to={`/auth/inventory/${inventoryId}`}
+        />
+        <PageHeading>Scan</PageHeading>
         <Scanner onDetected={this.handleDetected} />
         <div className="padded">
           { scannedItem ? (
@@ -111,27 +119,29 @@ class Scan extends Component {
           )
           }
         </div>
-        <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
+        {/* <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/auth/inventory/${inventoryId}`}>
               <Button color="secondary" size="md"><i className="fas fa-th-list" /> Back to List</Button>
             </Link>
           </Nav>
-        </Navbar>
-      </div>
+        </Navbar> */}
+      </Container>
     )
   }
 }
 
 Scan.propTypes = {
+  api: PropTypes.shape({}),
   match: PropTypes.shape({
     params: PropTypes.shape({
-      inventoryId: PropTypes.number,
+      inventoryId: PropTypes.string,
     }),
   }),
 }
 
 Scan.defaultProps = {
+  api: {},
   match: {},
 }
 

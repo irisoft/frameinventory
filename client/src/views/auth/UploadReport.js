@@ -1,8 +1,15 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
-import { Navbar, Nav, Button } from 'reactstrap'
+import Dropzone from 'react-dropzone'
+import Spinner from 'react-spinkit'
 import XLSX from 'xlsx'
-import DataAdapter from '../../dataAdapters/JsonApi'
+import PageHeading from '../../components/PageHeading'
+import Container from '../../components/Container'
+import ExcelIcon from '../../assets/excel-dark.png'
+import RoundButton from '../../components/RoundButton'
+import UploadIcon from '../../assets/upload-icon.png'
+import FolderIcon from '../../assets/folder-open-dark.png'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -10,89 +17,166 @@ class UploadReport extends Component {
 
     this.state = {
       file: null,
+      processingFile: false,
       readyToRedirect: false,
       inventoryId: null,
     }
-
-    this.dataAdapter = DataAdapter
   }
 
-  onChange = (e) => {
-    this.setState({ file: e.target.files[0] })
-  }
-
-  onFormSubmit = (e) => {
-    e.preventDefault()
-
-    const { file } = this.state
-    const reader = new FileReader()
-
-    reader.onload = (loadEvent) => {
-      const data = loadEvent.target.result
-
-      const workbook = XLSX.read(data, { type: 'binary' })
-
-      const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
-
-      this.dataAdapter.createNewInventory().then(async ({ id: inventoryId }) => {
-        const products = []
-
-        json.forEach((row) => {
-          const product = {
-            upc: row['EAN/UPC'],
-            description: row['Material Description'],
-            brand: row['Product Brand'],
-            type: row['Product Type'],
-            salesPrices: row['Sales Price'],
-            sellinPrice: row['Sell-in Price'],
-            reportQty: parseInt(row.Quantity.toString(), 10),
-            manualQty: 0,
-          }
-          products.push(product)
-        })
-
-        await this.dataAdapter.insertProducts(inventoryId, products)
-        this.setState({ readyToRedirect: true, inventoryId })
+  onDrop = (acceptedFiles) => {
+    if (acceptedFiles.length) {
+      this.setState({
+        file: acceptedFiles[0],
       })
     }
+  }
 
-    reader.readAsBinaryString(file)
+  processFile = () => {
+    this.setState({ processingFile: true }, () => {
+      const { file } = this.state
+      const { api } = this.props
+      const reader = new FileReader()
+
+      reader.onload = (loadEvent) => {
+        const data = loadEvent.target.result
+
+        const workbook = XLSX.read(data, { type: 'binary' })
+
+        const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
+
+        api.createNewInventory().then(async ({ id: inventoryId }) => {
+          const products = []
+
+          json.forEach((row) => {
+            const product = {
+              upc: row['EAN/UPC'],
+              description: row['Material Description'],
+              brand: row['Product Brand'],
+              type: row['Product Type'],
+              salesPrices: row['Sales Price'],
+              sellinPrice: row['Sell-in Price'],
+              reportQty: parseInt(row.Quantity.toString(), 10),
+              manualQty: 0,
+            }
+            products.push(product)
+          })
+
+          await api.insertProducts(inventoryId, products)
+          this.setState({ readyToRedirect: true, inventoryId })
+        })
+      }
+
+      reader.readAsBinaryString(file)
+    })
   }
 
   render() {
-    const { inventoryId, readyToRedirect, file } = this.state
+    const {
+      inventoryId, readyToRedirect, file, processingFile,
+    } = this.state
+    const { processFile } = this
 
-    return !readyToRedirect
-      ? (
-        <div>
-          <div className="padded">
-            <form onSubmit={this.onFormSubmit}>
-              <input accept=".xlsx" className="btn btn-secondary btn-block" type="file" onChange={this.onChange} name="file" id="exampleFile" />
-              <br />
-              {file && <input className="btn btn-primary btn-block" type="submit" value="Upload" />}
-            </form>
+    if (readyToRedirect) {
+      return (<Redirect to={`/auth/inventory/${inventoryId}`} />)
+    } else if (processingFile) {
+      return (
+        <Container>
+          <PageHeading>Get<br />Started</PageHeading>
+          <section className="mv3">
+            <div className="dropzone">
+              <div className="flex items-center justify-center bg-isgreen w-100 ba b--dashed b--light-silver flex pa5 br2 bw1">
+                <div>
+                  <div className="flex items-center space-between white lc">
+                    <Spinner name="cube-grid" color="white" />
+                    <span className="pl3">Processing your spreadsheet...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </Container>
+      )
+    }
+
+    return (
+      <Container>
+        <PageHeading>Get<br />Started</PageHeading>
+        <section className="mv3">
+          <div className="dropzone">
+            <Dropzone
+              onDrop={this.onDrop}
+              accept={'\u002Exlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
+              className="flex items-center justify-center bg-light-gray w-100 ba b--dashed b--light-silver flex pa4 br2 bw1"
+              activeClassName="bg-isgreen pa5"
+              rejectClassName="bg-isorange pa5"
+              disableClick
+              ref={(dropzone) => { this.dropzone = dropzone }}
+            >
+              {({ isDragActive, isDragReject }) => {
+                if (isDragReject) {
+                  return (
+                    <div className="white pv3">
+                      That is not a <strong>XLSX spreadsheet</strong>.
+                    </div>
+                  )
+                }
+
+                if (isDragActive) {
+                  return (
+                    <div className="white pv3">
+                      Now drop the file here.
+                    </div>
+                  )
+                }
+
+                if (file) {
+                  return (
+                    <div>
+                      <div className="flex items-center space-between mb4 mt1 gray lh-copy tc">
+                        <img className="mr2" src={ExcelIcon} alt="Excel Icon" height={24} />
+                        {file.name}
+                      </div>
+                      <div className="mb1">
+                        <RoundButton color="isgreen" textColor="white" label="Upload File" icon={UploadIcon} onClick={processFile} />
+                      </div>
+                    </div>
+                  )
+                }
+
+                return (
+                  <div>
+                    <div className="flex items-center space-between mb4 mt1 gray lh-copy tc">
+                      <img className="mr2" src={ExcelIcon} alt="Excel Icon" height={24} />
+                      <strong>Drag and drop</strong>&nbsp;spreadsheet.
+                    </div>
+                    <div className="mb1">
+                      <RoundButton color="isgreen" textColor="white" label="Upload New MIMs" icon={UploadIcon} onClick={() => { this.dropzone.open() }} />
+                    </div>
+                  </div>
+                )
+              }}
+            </Dropzone>
           </div>
-          <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
-            <Nav className="bottom-nav">
-              <Link to="/auth">
-                <Button color="danger" size="md"><i className="fas fa-times-circle" /> Cancel</Button>
-              </Link>
-            </Nav>
-          </Navbar>
-        </div>
-      )
-      : (
-        <Redirect to={`/auth/inventory/${inventoryId}`} />
-      )
+
+          <Link to="/auth/list" className="link">
+            <div className="flex items-center justify-center bg-white shadow-1 mt4 br2 pa4 dim pointer">
+              <div className="flex items-center ttu tracked black">
+                <img src={FolderIcon} alt="folder icon" className="mr2" /> VIEW EXISTING REPORT
+              </div>
+            </div>
+          </Link>
+        </section>
+      </Container>
+    )
   }
 }
 
 UploadReport.propTypes = {
-
+  api: PropTypes.shape({}),
 }
 
 UploadReport.defaultProps = {
-
+  api: null,
 }
 
 export default UploadReport

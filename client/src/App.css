@@ -1,6 +1,6 @@
 /* html, body, div, a, button, input {
   font-family: 'Helvetica', 'Arial', 'sans-serif';
-} */
+}
 
 .react-grid-Container {
   font-size: 12px;
@@ -89,11 +89,6 @@
 }
 
 .max-height {
-  height: stretch; /* fill-available; */
+  height: stretch; 
 }
-
-h1 {
-  font-size: 25px;
-  margin: 0;
-  padding: 15px 21px;
-}
+*/
