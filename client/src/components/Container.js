@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-function Container({ children }) {
+function Container({ children, wide }) {
   return (
-    <div className="w-100 pt4 mw8 center">
+    <div className={`w-100 pt4 ${wide ? 'mw8' : 'mw7'} center`}>
       { children }
     </div>
   )
@@ -11,10 +11,12 @@ function Container({ children }) {
 
 Container.propTypes = {
   children: PropTypes.node,
+  wide: PropTypes.bool,
 }
 
 Container.defaultProps = {
   children: null,
+  wide: false,
 }
 
 export default Container

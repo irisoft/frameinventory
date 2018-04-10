@@ -64,7 +64,7 @@ class ListInventories extends Component {
       <Container>
         <RoundButton
           label="< Back"
-          to="/"
+          to="/auth/"
         />
         <div className="flex items-end mb3">
           <div className="flex-auto">
@@ -74,12 +74,12 @@ class ListInventories extends Component {
           <div className="w-10-l w-20-m tracked ttu gray f6 tr">Frames</div>
         </div>
 
-        <ul className="list pl0 mt0">
+        <ul className="list pl0 mt0 mb7">
           {inventoriesItems}
         </ul>
 
         <PageFooter>
-          <RoundButton color="isgreen" textColor="white" label="Upload New MIMs" icon={UploadIcon} />
+          <RoundButton to="/auth" color="isgreen" textColor="white" label="Upload New MIMs" icon={UploadIcon} />
         </PageFooter>
 
         {/* <ListGroup>

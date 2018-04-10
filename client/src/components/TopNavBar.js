@@ -33,7 +33,7 @@ class TopNavBar extends Component {
 
   render() {
     return (
-      <header className="fixed w-100 top-0">
+      <header className="fixed w-100 top-0" style={{ zIndex: 1 }}>
         <nav className="w-100 pa3 flex items-center justify-between bg-dark-gray">
           <img alt="Irisoft Logo" height={18} src={logo} />
           <div className="tr">

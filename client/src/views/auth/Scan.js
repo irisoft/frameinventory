@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import Scanner from '../../components/Scanner'
 import PageHeading from '../../components/PageHeading'
 import Container from '../../components/Container'
+import RoundButton from '../../components/RoundButton'
 
 class Scan extends Component {
   constructor(props) {
@@ -59,13 +60,13 @@ class Scan extends Component {
   }
 
   render() {
-    // const {
-    //   match: {
-    //     params: {
-    //       inventoryId,
-    //     },
-    //   },
-    // } = this.props
+    const {
+      match: {
+        params: {
+          inventoryId,
+        },
+      },
+    } = this.props
 
     const {
       scannedItem,
@@ -74,6 +75,10 @@ class Scan extends Component {
 
     return (
       <Container>
+        <RoundButton
+          label="< Back"
+          to={`/auth/inventory/${inventoryId}`}
+        />
         <PageHeading>Scan</PageHeading>
         <Scanner onDetected={this.handleDetected} />
         <div className="padded">
