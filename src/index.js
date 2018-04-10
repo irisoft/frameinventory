@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 8080
 
 const cors = corsMiddleware({
   preflightMaxAge: 5,
-  origins: [ `http://localhost:${PORT}` ],
+  origins: [ `http://localhost:${PORT}`, 'https://irisoft-inventory.herokuapp.com/' ],
   allowHeaders: ['API-Token'],
   exposeHeaders: ['API-Token-Expiry']
 })
@@ -71,7 +71,7 @@ server.use((req, res, next) => {
   const { name: routeName } = req.getRoute()
 
   if (noAuthRequired.indexOf(routeName) > -1) return next()
-  
+
   const authHeader = req.headers.authorization || ''
   const match = authHeader.match(/Bearer (.+)/)
 
