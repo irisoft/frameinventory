@@ -68,6 +68,10 @@ body {
   height: 40px !important;
 }
 
+.react-grid-HeaderCell.status-indicator {
+  border-bottom: none;
+}
+
 .react-grid-Grid {
   border: none !important;
 }
@@ -92,4 +96,11 @@ body {
 
 .react-grid-Viewport {
   top: 40px !important;
+}
+
+.react-grid-Row .react-grid-Cell.status-indicator {
+  background-color: #F4F4F4 !important;
+  border-top: solid 1px #F4F4F4;
+  border-right: solid 1px #F4F4F4;
+  border-bottom: solid 1px #F4F4F4;
 }

@@ -27,6 +27,13 @@ const apiMethods = {
     }
   ),
 
+  getInventorySummary: ({ organizationId, inventoryId }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/getInventorySummary`,
+      method: 'get',
+    }
+  ),
+
   getInventoryProductsAndCounts: ({ organizationId, inventoryId, filter }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryProductsAndCounts?filter=${filter}`,
@@ -153,6 +160,19 @@ const JsonApi = token => ({
         organizationId: 1,
         inventoryId,
         upc,
+      },
+      null,
+      token,
+    )
+    return result
+  },
+
+  getInventorySummary: async (inventoryId) => {
+    const result = await makeApiCall(
+      'getInventorySummary',
+      {
+        organizationId: 1,
+        inventoryId,
       },
       null,
       token,
