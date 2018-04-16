@@ -66,6 +66,12 @@ server.use(restify.plugins.gzipResponse())
 server.use(restify.plugins.bodyParser({ mapParams: true }))
 server.use(restify.plugins.queryParser())
 
+// serve client as static files
+server.get(/\/?.*\//, restify.plugins.serveStatic({
+  directory: './client/build',
+  default: 'index.html',
+  appendRequestPath: true
+}))
 
 server.use((req, res, next) => {
   const { name: routeName } = req.getRoute()
@@ -105,13 +111,6 @@ requireAndInit([
   './handlers/inventoryCount',
   './handlers/product'
 ])
-
-// serve client as static files
-server.get(/\/?.*\//, restify.plugins.serveStatic({
-  directory: './client/build',
-  default: 'index.html',
-  appendRequestPath: true
-}))
 
 server.listen(PORT, function() {
   console.log('%s listening at %s', server.name, server.url)
