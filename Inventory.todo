@@ -1,6 +1,6 @@
 Trying to get everything ready to sell at Pearle trade show on April 28th
 
-☐ Import `react-dropzone` and support dragging+dropping files to upload
+✔ Import `react-dropzone` and support dragging+dropping files to upload @done(2018-04-10 01:53)
 ✔ Create HOC to replace `dataAdapter/JsonApi` and simplify passing of token to API @done(2018-03-22 11:36)
 ☐ Implement Andy's design (using tachyons instead of bootstrap -- optional)
 ☐ Integrate with Stripe API to support subscription / sign up

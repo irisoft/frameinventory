@@ -9,6 +9,8 @@ import UploadIcon from '../../assets/upload-icon.png'
 import OverArrow from '../../components/OverArrow'
 import UnderArrow from '../../components/UnderArrow'
 import EqualIcon from '../../components/EqualIcon'
+import StyleDiffDialog from '../../components/StyleDiffDialog'
+import FrameDiffDialog from '../../components/FrameDiffDialog'
 
 class RowRenderer extends React.Component {
   static propTypes = {
@@ -80,6 +82,8 @@ class ViewInventory extends Component {
     this.state = {
       inventoryProductsAndCounts: [],
       inventorySummary: [{}],
+      dialog_inventoryStyleDiff_open: false,
+      dialog_inventoryFrameDiff_open: false,
     }
 
     this.fetchData = this.fetchData.bind(this)
@@ -178,8 +182,10 @@ class ViewInventory extends Component {
     const {
       inventoryProductsAndCounts,
       inventorySummary,
+      dialog_inventoryFrameDiff_open,
+      dialog_inventoryStyleDiff_open,
     } = this.state
-    const { match: { params: { inventoryId } } } = this.props
+    const { match: { params: { inventoryId } }, api } = this.props
     return (
       <Container wide>
         <div className="flex items-center mb4">
@@ -238,13 +244,13 @@ class ViewInventory extends Component {
           </div>
           <div>&nbsp;=&nbsp;</div>
           <div className="bg-light-gray br2 pa3">
-            <div className="fl w-50 pa2 gray f6">
+            <div tabIndex={0} className="fl w-50 pa2 gray f6" onClick={() => { this.setState({ dialog_inventoryStyleDiff_open: true }) }}>
               Styles (UPCs)
             </div>
             <div className="fl w-50 pa2 tr near-black f5">
               {inventorySummary[0].style_diff}
             </div>
-            <div className="fl w-50 pa2 gray f6">
+            <div tabIndex={0} className="fl w-50 pa2 gray f6" onClick={() => { this.setState({ dialog_inventoryFrameDiff_open: true }) }}>
               Frames
             </div>
             <div className="fl w-50 pa2 tr near-black f5">
@@ -274,6 +280,25 @@ class ViewInventory extends Component {
             />
           }
         </div>
+        
+        <StyleDiffDialog
+          inventoryId={inventoryId}
+          isOpen={dialog_inventoryStyleDiff_open}
+          api={api}
+          status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
+          diff={inventorySummary[0].style_diff}
+          onClose={() => { this.setState({ dialog_inventoryStyleDiff_open: false }) }}
+        />
+
+        <FrameDiffDialog
+          inventoryId={inventoryId}
+          isOpen={dialog_inventoryFrameDiff_open}
+          api={api}
+          status={inventorySummary[0].frame_diff > 0 ? 'over' : 'under'}
+          diff={inventorySummary[0].frame_diff}
+          onClose={() => { this.setState({ dialog_inventoryFrameDiff_open: false }) }}
+        />
+
       </Container>
     )
   }

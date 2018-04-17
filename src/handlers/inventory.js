@@ -190,6 +190,75 @@ function Inventory(server, db) {
     }
   })
 
+  server.get({
+    name: 'getInventoryStylesDiff',
+    path: `${ROOT_PATH}/:inventoryId/getInventoryStylesDiff`
+  }, async function(req, res, next) {
+
+    const {
+      organizationId,
+      inventoryId
+    } = req.params
+
+    try {
+      res.send(await db.select({
+        name: 'getInventoryStylesDiff',
+        text: `
+          select
+          	p.upc upc
+          from
+          	inventory_count c inner join
+          	product p on p.id = c.product_id
+          where
+            c.inventory_id = $1 and
+          	c.manual_qty = 0 and
+          	c.report_qty > 0
+          order by
+          	p.upc
+        `,
+        values: [ inventoryId ]
+      }, true))
+      return next()
+    } catch (err) {
+      return next(err)
+    }
+  })
+
+  server.get({
+    name: 'getInventoryFramesDiff',
+    path: `${ROOT_PATH}/:inventoryId/getInventoryFramesDiff`
+  }, async function(req, res, next) {
+
+    const {
+      organizationId,
+      inventoryId
+    } = req.params
+
+    try {
+      res.send(await db.select({
+        name: 'getInventoryFramesDiff',
+        text: `
+          select
+          	p.upc upc,
+          	(c.report_qty - c.manual_qty) qty_diff
+          from
+          	inventory_count c inner join
+          	product p on p.id = c.product_id
+          where
+            c.inventory_id = $1 and
+          	c.manual_qty = 0 and
+          	c.report_qty > 0
+          order by
+          	p.upc
+        `,
+        values: [ inventoryId ]
+      }, true))
+      return next()
+    } catch (err) {
+      return next(err)
+    }
+  })
+
   server.post({
     name: 'uploadProductsAndCounts',
     path: `${ROOT_PATH}/:inventoryId/uploadProductsAndCounts`
@@ -289,3 +358,11 @@ function Inventory(server, db) {
 }
 
 module.exports = Inventory
+
+/*
+
+
+
+
+
+*/

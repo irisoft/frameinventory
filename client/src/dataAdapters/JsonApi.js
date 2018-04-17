@@ -34,6 +34,20 @@ const apiMethods = {
     }
   ),
 
+  getInventoryStylesDiff: ({ organizationId, inventoryId }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryStylesDiff`,
+      method: 'get',
+    }
+  ),
+
+  getInventoryFramesDiff: ({ organizationId, inventoryId }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryFramesDiff`,
+      method: 'get',
+    }
+  ),
+
   getInventoryProductsAndCounts: ({ organizationId, inventoryId, filter }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryProductsAndCounts?filter=${filter}`,
@@ -170,6 +184,32 @@ const JsonApi = token => ({
   getInventorySummary: async (inventoryId) => {
     const result = await makeApiCall(
       'getInventorySummary',
+      {
+        organizationId: 1,
+        inventoryId,
+      },
+      null,
+      token,
+    )
+    return result
+  },
+
+  getInventoryFramesDiff: async (inventoryId) => {
+    const result = await makeApiCall(
+      'getInventoryFramesDiff',
+      {
+        organizationId: 1,
+        inventoryId,
+      },
+      null,
+      token,
+    )
+    return result
+  },
+
+  getInventoryStylesDiff: async (inventoryId) => {
+    const result = await makeApiCall(
+      'getInventoryStylesDiff',
       {
         organizationId: 1,
         inventoryId,
