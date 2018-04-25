@@ -1,12 +1,14 @@
 Trying to get everything ready to sell at Pearle trade show on April 28th
 
-✔ Import `react-dropzone` and support dragging+dropping files to upload @done(2018-04-10 01:53)
-✔ Create HOC to replace `dataAdapter/JsonApi` and simplify passing of token to API @done(2018-03-22 11:36)
-☐ Implement Andy's design (using tachyons instead of bootstrap -- optional)
-☐ Integrate with Stripe API to support subscription / sign up
-✔ Build custom sign in form against Okta @done(2018-03-22 12:00)
-✔ Build custom sign up form against Okta @done(2018-03-22 16:27)
-☐ Use react-snapshot (or whatever works best) to get cached copies of certain pages for SEO
+✔ Implement Andy's design (using tachyons instead of bootstrap -- optional) @done(2018-04-24 22:52)
+☐ Make SCAN work on View Inventory screen
 ☐ Change database structure to support mutliple Okta users per ORGANIZATION
 ☐ Change login to look up Organization when logging in
 ☐ Change sign up form to support Org+Users model
+☐ Upgrade Heroku account to minimal production level
+☐ Integrate with Stripe API to support subscription / sign up
+☐ Use react-snapshot (or whatever works best) to get cached copies of certain pages for SEO
+✔ Import `react-dropzone` and support dragging+dropping files to upload @done(2018-04-10 01:53)
+✔ Create HOC to replace `dataAdapter/JsonApi` and simplify passing of token to API @done(2018-03-22 11:36)
+✔ Build custom sign in form against Okta @done(2018-03-22 12:00)
+✔ Build custom sign up form against Okta @done(2018-03-22 16:27)

@@ -151,37 +151,7 @@ function Inventory(server, db) {
     try {
       res.send(await db.select({
         name: 'getInventorySummary',
-        text: `
-          select
-            (select start_date from inventory where inventory.id = $1) start_date,
-          	sum(sq.manual_style_count) manual_style_count,
-          	sum(sq.report_style_count) report_style_count,
-          	sum(sq.manual_frame_count) manual_frame_count,
-          	sum(sq.report_frame_count) report_frame_count,
-          	sum(sq.manual_value) manual_value,
-          	sum(sq.report_value) report_value,
-          	(sum(sq.report_style_count) - sum(sq.manual_style_count)) style_diff,
-          	(sum(sq.report_frame_count) - sum(sq.manual_frame_count)) frame_diff,
-          	(sum(sq.report_value) - sum(sq.manual_value)) value_diff
-          from (
-          	select
-          		case when c.manual_qty > 0 then 1 else 0 end as manual_style_count,
-          		case when c.report_qty > 0 then 1 else 0 end as report_style_count,
-          		case when c.manual_qty > 0 then c.manual_qty else 0 end as manual_frame_count,
-          		case when c.report_qty > 0 then c.report_qty else 0 end as report_frame_count,
-          		p.sell_in_price,
-          		(case when c.manual_qty > 0 then (c.manual_qty * p.sell_in_price::money::numeric::float8) else 0 end)::float8::numeric::money as manual_value,
-          		(case when c.report_qty > 0 then (c.report_qty * p.sell_in_price::money::numeric::float8) else 0 end)::float8::numeric::money as report_value
-          	from
-          		inventory_count c inner join
-          		inventory i on i.id = c.inventory_id inner join
-          		product p on p.id = c.product_id
-            where
-              c.inventory_id = $1
-          	order by
-          		report_frame_count desc
-          ) sq
-        `,
+        text: 'SELECT * FROM inventory_summary($1)',
         values: [ inventoryId ]
       }, true))
       return next()

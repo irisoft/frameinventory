@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
 
@@ -34,10 +35,17 @@ class StyleDiffDialog extends Component {
 
   render() {
     const { styles } = this.state
+
     const {
-      isOpen, onClose, status, diff,
+      isOpen,
+      onClose,
+      status,
+      diff,
     } = this.props
+
     const rows = styles.map(style => (<li key={style.upc}><div className="pv3 ph4 ba b--moon-gray near-black">{style.upc}</div></li>))
+
+    const textToCopy = styles.map(style => `${style.upc}`).join('\n')
 
     return (
       isOpen
@@ -58,6 +66,9 @@ class StyleDiffDialog extends Component {
                 </div>
               </div>
             </div>
+            <CopyToClipboard text={textToCopy}>
+              <button>Copy</button>
+            </CopyToClipboard>
             <p className="gray tracked ttu f7">UPC</p>
             <div className="overflow-scroll h-100 tc">
               <ul className="list pl0">

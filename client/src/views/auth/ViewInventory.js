@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Moment from 'moment'
 import ReactDataGrid, { Row } from 'react-data-grid'
+import Spinner from 'react-spinkit'
 import Container from '../../components/Container'
 import RoundButton from '../../components/RoundButton'
 import UploadIcon from '../../assets/upload-icon.png'
@@ -11,6 +12,10 @@ import UnderArrow from '../../components/UnderArrow'
 import EqualIcon from '../../components/EqualIcon'
 import StyleDiffDialog from '../../components/StyleDiffDialog'
 import FrameDiffDialog from '../../components/FrameDiffDialog'
+
+function isArrayValid(a) {
+  return Array.isArray(a) && a.length > 0
+}
 
 class RowRenderer extends React.Component {
   static propTypes = {
@@ -65,8 +70,8 @@ function PercentCompleteFormatter({ value }) {
   return (
     <div className="tc" style={{ }}>
       { value === 0 && <EqualIcon />}
-      { value < 0 && <OverArrow />}
-      { value > 0 && <UnderArrow />}
+      { value > 0 && <OverArrow />}
+      { value < 0 && <UnderArrow />}
     </div>
   )
 }
@@ -82,13 +87,15 @@ class ViewInventory extends Component {
     this.state = {
       inventoryProductsAndCounts: [],
       inventorySummary: [{}],
-      dialog_inventoryStyleDiff_open: false,
-      dialog_inventoryFrameDiff_open: false,
+      dialogInventoryStyleDiffOpen: false,
+      dialogInventoryFrameDiffOpen: false,
+      reportIsReady: false,
+      readyToTransition: false,
     }
 
     this.fetchData = this.fetchData.bind(this)
 
-    this.columns = (screenIsSmall) => {
+    this.columns = () => {
       const columns = [
         {
           key: 'upc', name: 'UPC', width: 160, sortable: true,
@@ -107,15 +114,6 @@ class ViewInventory extends Component {
         },
       ]
 
-      if (!screenIsSmall) {
-        columns.push()
-        columns.push()
-        columns.push()
-      }
-
-      columns.push()
-      columns.push()
-
       return columns
     }
   }
@@ -124,11 +122,30 @@ class ViewInventory extends Component {
     this.fetchData()
   }
 
+  componentWillReceiveProps(nextProps, nextState) {
+  }
+
   componentDidUpdate(prevProps) {
     const { match: { params: { inventoryId: previousInventoryId } } } = prevProps
     const { match: { params: { inventoryId } } } = this.props
     if (inventoryId && (inventoryId !== previousInventoryId)) {
       this.fetchData()
+    }
+
+    const {
+      inventoryProductsAndCounts,
+      inventorySummary,
+      readyToTransition,
+    } = this.state
+
+    if (!readyToTransition) {
+      const ready = isArrayValid(inventoryProductsAndCounts) && isArrayValid(inventorySummary)
+      if (ready) {
+        this.setState({ readyToTransition: true })
+        setTimeout(() => {
+          this.setState({ reportIsReady: true })
+        }, 1000)
+      }
     }
   }
 
@@ -182,10 +199,151 @@ class ViewInventory extends Component {
     const {
       inventoryProductsAndCounts,
       inventorySummary,
-      dialog_inventoryFrameDiff_open,
-      dialog_inventoryStyleDiff_open,
+      dialogInventoryFrameDiffOpen,
+      dialogInventoryStyleDiffOpen,
+      readyToTransition,
+      reportIsReady,
     } = this.state
-    const { match: { params: { inventoryId } }, api } = this.props
+
+    const {
+      match: {
+        params: {
+          inventoryId,
+        },
+      },
+      api,
+    } = this.props
+
+    let pageContents
+
+    if (!reportIsReady) {
+      pageContents = (
+        <section className={`mv3 fade-in ${readyToTransition && 'fade-out'}`}>
+          <div className="dropzone">
+            <div className="flex items-center justify-center bg-moon-gray w-100 ba b--dashed b--light-silver flex pa5 br2 bw1">
+              <div>
+                <div className="flex items-center space-between near-black lc">
+                  <Spinner name="cube-grid" color="black" fadeIn="none" />
+                  <span className="pl3">Building your report...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )
+    } else {
+      pageContents = (
+        <div className="fade-in">
+          <div className="flex mb4">
+            <div className="bg-light-gray br2 pa3 w-third">
+              <div className="cf">
+                <div className="fl w-50 pa2 gray f6">
+                  <span className="pa2 dib">Styles (UPCs)</span>
+                </div>
+                <div className="fl w-50 pa2 tr near-black f5">
+                  <span className="pa2 dib">{inventorySummary[0].scan_style_count}</span>
+                </div>
+              </div>
+              <div className="cf">
+                <div className="fl w-50 pa2 gray f6">
+                  <span className="pa2 dib">Frames</span>
+                </div>
+                <div className="fl w-50 pa2 tr near-black f5">
+                  <span className="pa2 dib">{inventorySummary[0].scan_frame_count}</span>
+                </div>
+              </div>
+              <div className="cf">
+                <div className="fl w-50 pa2 gray f6">
+                  <span className="pa2 dib">Value</span>
+                </div>
+                <div className="fl w-50 pa2 tr near-black f5">
+                  <span className="pa2 dib">{inventorySummary[0].scan_value}</span>
+                </div>
+              </div>
+            </div>
+            <div className="bold black flex items-center">&nbsp;-&nbsp;</div>
+            <div className="bg-light-gray br2 pa3 w-third">
+              <div className="cf">
+                <div className="fl w-50 pa2 gray f6">
+                  <span className="pa2 dib">Styles (UPCs)</span>
+                </div>
+                <div className="fl w-50 pa2 tr near-black f5">
+                  <span className="pa2 dib">{inventorySummary[0].report_style_count}</span>
+                </div>
+              </div>
+              <div className="cf">
+                <div className="fl w-50 pa2 gray f6">
+                  <span className="pa2 dib">Frames</span>
+                </div>
+                <div className="fl w-50 pa2 tr near-black f5">
+                  <span className="pa2 dib">{inventorySummary[0].report_frame_count}</span>
+                </div>
+              </div>
+              <div className="cf">
+                <div className="fl w-50 pa2 gray f6">
+                  <span className="pa2 dib">Value</span>
+                </div>
+                <div className="fl w-50 pa2 tr near-black f5">
+                  <span className="pa2 dib">{inventorySummary[0].report_value}</span>
+                </div>
+              </div>
+            </div>
+            <div className="bold black flex items-center">&nbsp;=&nbsp;</div>
+            <div className="bg-light-gray br2 pa3 w-third">
+              <div className="fl w-100 pa2">
+                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim" onClick={() => { this.setState({ dialogInventoryStyleDiffOpen: true }) }}>
+                  { inventorySummary[0].style_diff > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
+                  {Math.abs(inventorySummary[0].style_diff)} Styles { inventorySummary[0].style_diff > 0 ? 'More' : 'Less' }
+                </button>
+              </div>
+              <div className="fl w-100 pa2">
+                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim" onClick={() => { this.setState({ dialogInventoryFrameDiffOpen: true }) }}>
+                  { inventorySummary[0].frame_diff > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
+                  {Math.abs(inventorySummary[0].frame_diff)} Frames { inventorySummary[0].style_diff > 0 ? 'More' : 'Less' }
+                </button>
+              </div>
+              <div className="fl w-100 pa2 gray f6">
+                <span className="pa2 dib">Difference in value: <span className="f5 near-black">{inventorySummary[0].value_diff}</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div className="max-height" style={{ marginRight: -90 }}>
+            {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
+              <ReactDataGrid
+                columns={this.columns(false)}
+                rowGetter={this.rowGetter}
+                rowsCount={inventoryProductsAndCounts.length}
+                minHeight={1000}
+                onGridSort={this.handleGridSort}
+                enableCellSelect
+                onGridRowsUpdated={this.handleGridRowsUpdated}
+                rowRenderer={RowRenderer}
+                rowHeight={80}
+              />
+            }
+          </div>
+
+          <StyleDiffDialog
+            inventoryId={inventoryId}
+            isOpen={dialogInventoryStyleDiffOpen}
+            api={api}
+            status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
+            diff={inventorySummary[0].style_diff}
+            onClose={() => { this.setState({ dialogInventoryStyleDiffOpen: false }) }}
+          />
+
+          <FrameDiffDialog
+            inventoryId={inventoryId}
+            isOpen={dialogInventoryFrameDiffOpen}
+            api={api}
+            status={inventorySummary[0].frame_diff > 0 ? 'over' : 'under'}
+            diff={inventorySummary[0].frame_diff}
+            onClose={() => { this.setState({ dialogInventoryFrameDiffOpen: false }) }}
+          />
+        </div>
+      )
+    }
     return (
       <Container wide>
         <div className="flex items-center mb4">
@@ -199,106 +357,7 @@ class ViewInventory extends Component {
           <h2 className="f5 normal flex-auto mb0 mt2">{new Moment(inventorySummary[0].start_date).format('dddd, MMMM Do')}</h2>
           <RoundButton to={`/auth/scan/${inventoryId}`} color="isgreen" textColor="white" label="Scan" icon={UploadIcon} />
         </div>
-
-        <div className="flex items-center mb4">
-          <div className="bg-light-gray br2 pa3">
-            <div className="fl w-50 pa2 gray f6">
-              Styles (UPCs)
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].report_style_count}
-            </div>
-            <div className="fl w-50 pa2 gray f6">
-              Frames
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].report_frame_count}
-            </div>
-            <div className="fl w-50 pa2 gray f6">
-              Value
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].report_value}
-            </div>
-          </div>
-          <div className="bold black">&nbsp;-&nbsp;</div>
-          <div className="bg-light-gray br2 pa3">
-            <div className="fl w-50 pa2 gray f6">
-              Styles (UPCs)
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].manual_style_count}
-            </div>
-            <div className="fl w-50 pa2 gray f6">
-              Frames
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].manual_frame_count}
-            </div>
-            <div className="fl w-50 pa2 gray f6">
-              Value
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].manual_value}
-            </div>
-          </div>
-          <div>&nbsp;=&nbsp;</div>
-          <div className="bg-light-gray br2 pa3">
-            <div tabIndex={0} className="fl w-50 pa2 gray f6" onClick={() => { this.setState({ dialog_inventoryStyleDiff_open: true }) }}>
-              Styles (UPCs)
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].style_diff}
-            </div>
-            <div tabIndex={0} className="fl w-50 pa2 gray f6" onClick={() => { this.setState({ dialog_inventoryFrameDiff_open: true }) }}>
-              Frames
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].frame_diff}
-            </div>
-            <div className="fl w-50 pa2 gray f6">
-              Value
-            </div>
-            <div className="fl w-50 pa2 tr near-black f5">
-              {inventorySummary[0].value_diff}
-            </div>
-          </div>
-        </div>
-
-        <div className="max-height" style={{ marginRight: -90 }}>
-          {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
-            <ReactDataGrid
-              columns={this.columns(false)}
-              rowGetter={this.rowGetter}
-              rowsCount={inventoryProductsAndCounts.length}
-              minHeight={1000}
-              onGridSort={this.handleGridSort}
-              enableCellSelect
-              onGridRowsUpdated={this.handleGridRowsUpdated}
-              rowRenderer={RowRenderer}
-              rowHeight={80}
-            />
-          }
-        </div>
-        
-        <StyleDiffDialog
-          inventoryId={inventoryId}
-          isOpen={dialog_inventoryStyleDiff_open}
-          api={api}
-          status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
-          diff={inventorySummary[0].style_diff}
-          onClose={() => { this.setState({ dialog_inventoryStyleDiff_open: false }) }}
-        />
-
-        <FrameDiffDialog
-          inventoryId={inventoryId}
-          isOpen={dialog_inventoryFrameDiff_open}
-          api={api}
-          status={inventorySummary[0].frame_diff > 0 ? 'over' : 'under'}
-          diff={inventorySummary[0].frame_diff}
-          onClose={() => { this.setState({ dialog_inventoryFrameDiff_open: false }) }}
-        />
-
+        {pageContents}
       </Container>
     )
   }
@@ -310,10 +369,14 @@ ViewInventory.propTypes = {
       inventoryId: PropTypes.string,
     }),
   }),
+  api: PropTypes.shape({
+
+  }),
 }
 
 ViewInventory.defaultProps = {
   match: null,
+  api: null,
 }
 
 export default ViewInventory

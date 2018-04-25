@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
 
@@ -34,15 +35,22 @@ class FrameDiffDialog extends Component {
 
   render() {
     const { frames } = this.state
+
     const {
-      isOpen, onClose, status, diff,
+      isOpen,
+      onClose,
+      status,
+      diff,
     } = this.props
+
     const rows = frames.map(frame => (<li key={frame.upc}>
       <div className="cf">
         <div className="pa3 ba b--moon-gray near-black fl w-70">{frame.upc}</div>
         <div className="pa3 ba b--moon-gray near-black fl w-30">{frame.qty_diff}</div>
       </div>
     </li>))
+
+    const textToCopy = frames.map(frame => `${frame.upc}\t${frame.qty_diff}`).join('\n')
 
     return (
       isOpen
@@ -63,6 +71,9 @@ class FrameDiffDialog extends Component {
                 </div>
               </div>
             </div>
+            <CopyToClipboard text={textToCopy}>
+              <button>Copy</button>
+            </CopyToClipboard>
             <div className="overflow-scroll h-100 tc">
               <ul className="list pl0">
                 <li>

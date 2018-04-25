@@ -12,6 +12,7 @@
     "prop-types": "^15.6.0",
     "quagga": "^0.12.1",
     "react": "^16.2.0",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-data-grid": "^3.0.8",
     "react-dom": "^16.2.0",
     "react-dropzone": "^4.2.9",
