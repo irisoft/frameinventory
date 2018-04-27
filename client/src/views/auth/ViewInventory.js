@@ -291,13 +291,13 @@ class ViewInventory extends Component {
             <div className="bold black flex items-center">&nbsp;=&nbsp;</div>
             <div className="bg-light-gray br2 pa3 w-third">
               <div className="fl w-100 pa2">
-                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim" onClick={() => { this.setState({ dialogInventoryStyleDiffOpen: true }) }}>
+                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim outline-0" onClick={() => { this.setState({ dialogInventoryStyleDiffOpen: true }) }}>
                   { inventorySummary[0].style_diff > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
                   {Math.abs(inventorySummary[0].style_diff)} Styles { inventorySummary[0].style_diff > 0 ? 'More' : 'Less' }
                 </button>
               </div>
               <div className="fl w-100 pa2">
-                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim" onClick={() => { this.setState({ dialogInventoryFrameDiffOpen: true }) }}>
+                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim outline-0" onClick={() => { this.setState({ dialogInventoryFrameDiffOpen: true }) }}>
                   { inventorySummary[0].frame_diff > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
                   {Math.abs(inventorySummary[0].frame_diff)} Frames { inventorySummary[0].style_diff > 0 ? 'More' : 'Less' }
                 </button>
@@ -329,7 +329,7 @@ class ViewInventory extends Component {
             isOpen={dialogInventoryStyleDiffOpen}
             api={api}
             status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
-            diff={inventorySummary[0].style_diff}
+            diff={Math.abs(inventorySummary[0].style_diff)}
             onClose={() => { this.setState({ dialogInventoryStyleDiffOpen: false }) }}
           />
 
@@ -338,7 +338,7 @@ class ViewInventory extends Component {
             isOpen={dialogInventoryFrameDiffOpen}
             api={api}
             status={inventorySummary[0].frame_diff > 0 ? 'over' : 'under'}
-            diff={inventorySummary[0].frame_diff}
+            diff={Math.abs(inventorySummary[0].frame_diff)}
             onClose={() => { this.setState({ dialogInventoryFrameDiffOpen: false }) }}
           />
         </div>
