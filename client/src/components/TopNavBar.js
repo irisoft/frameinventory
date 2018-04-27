@@ -4,12 +4,13 @@ import PropTypes from 'prop-types'
 import { withAuth } from '@okta/okta-react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/company-logo-white.png'
+import RoundButton from './RoundButton'
 
 class TopNavBar extends Component {
   constructor(props) {
     super(props)
     this.toggleNavbar = this.toggleNavbar.bind(this)
-    this.state = { authenticated: null, isOpen: false }
+    this.state = { authenticated: false, isOpen: false }
     this.checkAuthentication = this.checkAuthentication.bind(this)
     this.checkAuthentication()
   }
@@ -37,13 +38,13 @@ class TopNavBar extends Component {
         <nav className="w-100 pa3 flex items-center justify-between bg-dark-gray">
           <img alt="Irisoft Logo" height={18} src={logo} />
           <div className="tr">
-            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/">Home</Link>
-            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/about">About</Link>
-            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/sign-up">Register</Link>
-            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/auth/">Inventory</Link>
+            {/* <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/">Home</Link>
+              <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/about">About</Link>
+              <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/sign-up">Register</Link>
+            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/auth/">Inventory</Link> */}
             { this.state.authenticated
-              ? <button className="btn btn-default" onClick={this.props.auth.logout}>Logout</button>
-              : <button className="btn btn-default" onClick={this.props.auth.login}>Login</button>
+              ? <RoundButton mini color="isgreen" textColor="white" onClick={this.props.auth.logout} label="Logout" />
+              : <RoundButton mini color="isgreen" textColor="white" onClick={this.props.auth.login} label="Login" />
             }
           </div>
         </nav>

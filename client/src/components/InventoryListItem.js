@@ -22,11 +22,11 @@ function InventoryListItem({
             <h2 className="f3 fw3 db ma0 pa0 black">{date.format('dddd')}</h2>
             <h3 className="f4 fw3 db gray ma0 pa0">{date.format('MMM D')}</h3>
           </div>
-          <div className="w-10-l w-20-m tr f3 fw3 dark-gray items-center">
-            <OverArrow />&nbsp;&nbsp; {overCount}
+          <div className="w-20 tr f3 fw3 dark-gray items-center">
+            {overCount}&nbsp;&nbsp;<OverArrow />
           </div>
-          <div className="w-10-l w-20-m tr f3 fw3 dark-gray items-center">
-            <UnderArrow />&nbsp;&nbsp; {underCount}
+          <div className="w-20 tr f3 fw3 dark-gray items-center">
+            {underCount}&nbsp;&nbsp;<UnderArrow />
           </div>
         </div>
       </li>

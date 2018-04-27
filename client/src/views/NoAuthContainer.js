@@ -9,9 +9,9 @@ function NoAuthContainer() {
   return (
     <div>
       <Route exact path="/" component={Home} />
-      <Route path="/about" component={About} />
+      {/* <Route path="/about" component={About} /> */}
       <Route path="/sign-in" render={() => <SignIn baseUrl="https://dev-924982.oktapreview.com" />} />
-      <Route path="/sign-up" component={SignUp} />
+      {/* <Route path="/sign-up" component={SignUp} /> */}
     </div>
   )
 }

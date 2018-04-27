@@ -3,12 +3,15 @@ import PropTypes from 'prop-types'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
+import RoundButton from '../components/RoundButton'
+import copyIcon from '../assets/copy-icon.png'
 
 class StyleDiffDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
       styles: [],
+      copied: false
     }
   }
 
@@ -34,7 +37,7 @@ class StyleDiffDialog extends Component {
   }
 
   render() {
-    const { styles } = this.state
+    const { styles, copied } = this.state
 
     const {
       isOpen,
@@ -66,12 +69,20 @@ class StyleDiffDialog extends Component {
                 </div>
               </div>
             </div>
-            <CopyToClipboard text={textToCopy}>
-              <button>Copy</button>
+            <CopyToClipboard text={textToCopy}
+              onCopy={() => {
+                this.setState({ copied: true }, () => {
+                  setTimeout(() => {
+                    this.setState({ copied: false })
+                  }, 5000)
+                })
+              }}>
+              <RoundButton color="isgreen" icon={copyIcon} textColor="white" label={copied ? 'Copied' : 'Copy All'} onClick={() => {}} />
             </CopyToClipboard>
-            <p className="gray tracked ttu f7">UPC</p>
-            <div className="overflow-scroll h-100 tc">
+
+            <div className="overflow-scroll h-100 tc mt3">
               <ul className="list pl0">
+                <li className="gray tracked ttu f7 pb2">UPC</li>
                 {rows}
               </ul>
             </div>

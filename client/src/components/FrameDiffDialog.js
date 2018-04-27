@@ -3,12 +3,15 @@ import PropTypes from 'prop-types'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
+import RoundButton from '../components/RoundButton'
+import copyIcon from '../assets/copy-icon.png'
 
 class FrameDiffDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
       frames: [],
+      copied: false,
     }
   }
 
@@ -34,7 +37,7 @@ class FrameDiffDialog extends Component {
   }
 
   render() {
-    const { frames } = this.state
+    const { frames, copied } = this.state
 
     const {
       isOpen,
@@ -71,10 +74,19 @@ class FrameDiffDialog extends Component {
                 </div>
               </div>
             </div>
-            <CopyToClipboard text={textToCopy}>
-              <button>Copy</button>
+            <CopyToClipboard
+              text={textToCopy}
+              onCopy={() => {
+                this.setState({ copied: true }, () => {
+                  setTimeout(() => {
+                    this.setState({ copied: false })
+                  }, 5000)
+                })
+              }}
+            >
+              <RoundButton color="isgreen" icon={copyIcon} textColor="white" label={copied ? 'Copied' : 'Copy All'} onClick={() => {}} />
             </CopyToClipboard>
-            <div className="overflow-scroll h-100 tc">
+            <div className="overflow-scroll h-100 tc mt3">
               <ul className="list pl0">
                 <li>
                   <div className="cf">
