@@ -195,7 +195,7 @@ const JsonApi = token => ({
   },
 
   getInventoryFramesDiff: async (inventoryId) => {
-    const result = await makeApiCall(
+    const [over, under] = await makeApiCall(
       'getInventoryFramesDiff',
       {
         organizationId: 1,
@@ -204,7 +204,7 @@ const JsonApi = token => ({
       null,
       token,
     )
-    return result
+    return { over, under }
   },
 
   getInventoryStylesDiff: async (inventoryId) => {

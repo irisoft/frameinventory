@@ -205,24 +205,18 @@ function Inventory(server, db) {
     } = req.params
 
     try {
-      res.send(await db.select({
-        name: 'getInventoryFramesDiff',
-        text: `
-          select
-          	p.upc upc,
-          	(c.report_qty - c.manual_qty) qty_diff
-          from
-          	inventory_count c inner join
-          	product p on p.id = c.product_id
-          where
-            c.inventory_id = $1 and
-          	c.manual_qty = 0 and
-          	c.report_qty > 0
-          order by
-          	p.upc
-        `,
-        values: [ inventoryId ]
-      }, true))
+      res.send([
+        await db.select({
+          name: 'getInventoryFramesOver',
+          text: 'select * from inventory_frames_over($1)',
+          values: [ inventoryId ]
+        }, true),
+        await db.select({
+          name: 'getInventoryFramesUnder',
+          text: 'select * from inventory_frames_under($1)',
+          values: [ inventoryId ]
+        }, true)
+      ])
       return next()
     } catch (err) {
       return next(err)

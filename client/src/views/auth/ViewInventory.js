@@ -10,8 +10,7 @@ import UploadIcon from '../../assets/upload-icon.png'
 import OverArrow from '../../components/OverArrow'
 import UnderArrow from '../../components/UnderArrow'
 import EqualIcon from '../../components/EqualIcon'
-import StyleDiffDialog from '../../components/StyleDiffDialog'
-import FrameDiffDialog from '../../components/FrameDiffDialog'
+import CopyDialog from '../../components/CopyDialog'
 
 function isArrayValid(a) {
   return Array.isArray(a) && a.length > 0
@@ -88,7 +87,8 @@ class ViewInventory extends Component {
       inventoryProductsAndCounts: [],
       inventorySummary: [{}],
       dialogInventoryStyleDiffOpen: false,
-      dialogInventoryFrameDiffOpen: false,
+      FramesOverDialogOpen: false,
+      FramesUnderDialogOpen: false,
       reportIsReady: false,
       readyToTransition: false,
     }
@@ -120,9 +120,6 @@ class ViewInventory extends Component {
 
   componentDidMount() {
     this.fetchData()
-  }
-
-  componentWillReceiveProps(nextProps, nextState) {
   }
 
   componentDidUpdate(prevProps) {
@@ -199,7 +196,8 @@ class ViewInventory extends Component {
     const {
       inventoryProductsAndCounts,
       inventorySummary,
-      dialogInventoryFrameDiffOpen,
+      FramesOverDialogOpen,
+      FramesUnderDialogOpen,
       dialogInventoryStyleDiffOpen,
       readyToTransition,
       reportIsReady,
@@ -297,9 +295,22 @@ class ViewInventory extends Component {
                 </button>
               </div>
               <div className="fl w-100 pa2">
-                <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim outline-0" onClick={() => { this.setState({ dialogInventoryFrameDiffOpen: true }) }}>
-                  { inventorySummary[0].frame_diff > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
-                  {Math.abs(inventorySummary[0].frame_diff)} Frames { inventorySummary[0].style_diff > 0 ? 'More' : 'Less' }
+                <button
+                  className="pv2 gray f5 bn bg-near-white br-pill br--left ph4 pointer dim outline-0 w-50"
+                  onClick={() => { this.setState({ FramesOverDialogOpen: true }) }}
+                  title={`${inventorySummary[0].styles_over} styles with more frames than MIMs`}
+                >
+                  <OverArrow />&nbsp;
+                  {inventorySummary[0].styles_over}
+                </button>
+
+                <button
+                  className="pv2 gray f5 bn bg-near-white br-pill br--right ph4 pointer dim outline-0 w-50"
+                  onClick={() => { this.setState({ FramesUnderDialogOpen: true }) }}
+                  title={`${inventorySummary[0].styles_under} styles with fewer frames than MIMs`}
+                >
+                  <UnderArrow />&nbsp;
+                  {inventorySummary[0].styles_under}
                 </button>
               </div>
               <div className="fl w-100 pa2 gray f6">
@@ -324,26 +335,45 @@ class ViewInventory extends Component {
             }
           </div>
 
-          <StyleDiffDialog
-            inventoryId={inventoryId}
+          <CopyDialog
             isOpen={dialogInventoryStyleDiffOpen}
-            api={api}
-            status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
-            diff={Math.abs(inventorySummary[0].style_diff)}
             onClose={() => { this.setState({ dialogInventoryStyleDiffOpen: false }) }}
+            status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
+            fetchData={async () => {
+              const data = await api.getInventoryStylesDiff(inventoryId)
+              return data
+            }}
+            name="StyleDiffDialog"
+            title={`${Math.abs(inventorySummary[0].style_diff)} ${(inventorySummary[0].style_diff > 0) ? 'more styles than MIMs' : 'less styles than MIMs'}`}
           />
 
-          <FrameDiffDialog
-            inventoryId={inventoryId}
-            isOpen={dialogInventoryFrameDiffOpen}
-            api={api}
-            status={inventorySummary[0].frame_diff > 0 ? 'over' : 'under'}
-            diff={Math.abs(inventorySummary[0].frame_diff)}
-            onClose={() => { this.setState({ dialogInventoryFrameDiffOpen: false }) }}
+          <CopyDialog
+            isOpen={FramesOverDialogOpen}
+            onClose={() => { this.setState({ FramesOverDialogOpen: false }) }}
+            status="over"
+            fetchData={async () => {
+              const { over } = await api.getInventoryFramesDiff(inventoryId)
+              return over
+            }}
+            name="FramesOverDialog"
+            title={`${inventorySummary[0].styles_over} styles with more frames than MIMs`}
+          />
+
+          <CopyDialog
+            isOpen={FramesUnderDialogOpen}
+            onClose={() => { this.setState({ FramesUnderDialogOpen: false }) }}
+            status="under"
+            fetchData={async () => {
+              const { under } = await api.getInventoryFramesDiff(inventoryId)
+              return under
+            }}
+            name="FramesUnderDialog"
+            title={`${inventorySummary[0].styles_under} styles with fewer frames than MIMs`}
           />
         </div>
       )
     }
+
     return (
       <Container wide>
         <div className="flex items-center mb4">
