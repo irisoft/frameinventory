@@ -6,6 +6,8 @@ import Scanner from '../../components/Scanner'
 import PageHeading from '../../components/PageHeading'
 import Container from '../../components/Container'
 import RoundButton from '../../components/RoundButton'
+import BeepFail from '../../assets/beep-fail.mp3'
+import BeepSuccess from '../../assets/beep-success.mp3'
 
 class Scan extends Component {
   constructor(props) {
@@ -38,6 +40,7 @@ class Scan extends Component {
     let productAndCount = await api.getProductAndCountByUPC(result, inventoryId)
     const isValid = this.validateItem(productAndCount)
     if (isValid) {
+      this.beepSuccess.play()
       this.setState({ scannedItem: productAndCount, failedCode: null }, async () => {
         await api.updateCount(
           productAndCount.upc,
@@ -53,6 +56,7 @@ class Scan extends Component {
         })
       })
     } else {
+      this.beepFail.play()
       this.setState({ scannedItem: false, failedCode: result }, () => {
         makeReadyForTheNextOne()
       })
@@ -122,10 +126,25 @@ class Scan extends Component {
         {/* <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
             <Link to={`/auth/inventory/${inventoryId}`}>
-              <Button color="secondary" size="md"><i className="fas fa-th-list" /> Back to List</Button>
+          <Button color="secondary" size="md"><i className="fas fa-th-list" /> Back to List</Button>
             </Link>
           </Nav>
         </Navbar> */}
+
+        <audio ref={(el) => {
+          this.beepSuccess = el
+        }}
+        >
+          <source src={BeepSuccess} type="audio/mpeg" />
+        </audio>
+
+        <audio ref={(el) => {
+          this.beepFail = el
+        }}
+        >
+          <source src={BeepFail} type="audio/mpeg" />
+        </audio>
+
       </Container>
     )
   }
