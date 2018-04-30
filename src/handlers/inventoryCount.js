@@ -30,11 +30,11 @@ function InventoryCount(server, db) {
                 product
               WHERE
                 organization_id = $2 AND
-                upc = $3
+                upc LIKE $3
               LIMIT 1
             )
         `,
-        values: [ inventoryId, organizationId, upc, manualQty ]
+        values: [ inventoryId, organizationId, `%${upc}`, manualQty ]
       }))
       return next()
     } catch (err) {

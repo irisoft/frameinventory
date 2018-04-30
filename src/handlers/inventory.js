@@ -82,9 +82,9 @@ function Inventory(server, db) {
           	product p ON c.product_id = p.id
           WHERE
           	c.inventory_id = $1 AND
-          	p.upc = $2
+          	p.upc LIKE $2
         `,
-        values: [ inventoryId, upc ]
+        values: [ inventoryId, `%${upc}` ]
       }))
       return next()
     } catch (err) {
