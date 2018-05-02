@@ -4,7 +4,6 @@ import { Security, SecureRoute, ImplicitCallback } from '@okta/okta-react'
 import NoAuthContainer from './views/NoAuthContainer'
 import AuthContainer from './views/auth/AuthContainer'
 import TopNavBar from './components/TopNavBar'
-import './App.css'
 
 const config = {
   issuer: 'https://dev-924982.oktapreview.com/oauth2/default',

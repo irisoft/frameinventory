@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 // import { Navbar, NavbarBrand, Nav, NavItem, NavLink, NavbarToggler, Collapse } from 'reactstrap'
 import { withAuth } from '@okta/okta-react'
-import { Link } from 'react-router-dom'
-import logo from '../assets/company-logo-white.png'
+// import { Link } from 'react-router-dom'
+import logo from '../assets/fifo-logo-white.svg'
 import RoundButton from './RoundButton'
 
 class TopNavBar extends Component {
@@ -36,12 +36,34 @@ class TopNavBar extends Component {
     return (
       <header className="fixed w-100 top-0" style={{ zIndex: 1 }}>
         <nav className="w-100 pa3 flex items-center justify-between bg-dark-gray">
-          <img alt="Irisoft Logo" height={18} src={logo} />
+          <img alt="Irisoft Logo" height={48} src={logo} />
           <div className="tr">
-            {/* <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/">Home</Link>
-              <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/about">About</Link>
-              <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/sign-up">Register</Link>
-            <Link className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" to="/auth/">Inventory</Link> */}
+            {/*
+              <Link
+                className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3"
+                to="/"
+              >
+                Home
+              </Link>
+              <Link
+                className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3"
+                to="/about"
+              >
+                About
+              </Link>
+              <Link
+                className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" 
+                to="/sign-up"
+              >
+                Register
+              </Link>
+              <Link
+                className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3"
+                to="/auth/"
+              >
+                Inventory
+              </Link>
+            */}
             { this.state.authenticated
               ? <RoundButton mini color="isgreen" textColor="white" onClick={this.props.auth.logout} label="Logout" />
               : <RoundButton mini color="isgreen" textColor="white" onClick={this.props.auth.login} label="Login" />
