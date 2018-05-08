@@ -31,7 +31,7 @@ const noAuthRequired = [
   'createOrganization'
 ]
 
-async function queryDB({ text, values, name }, expectRows = true, forceArray = false) {
+async function queryDB({ text, values, name }, expectRows = true, forceArray = false, okWithNoRows = false) {
   const { rows, rowCount } = await pool.query({
     text,
     values
@@ -43,14 +43,16 @@ async function queryDB({ text, values, name }, expectRows = true, forceArray = f
     return rows
   } else if (!expectRows) {
     return { rowCount }
+  } else if (okWithNoRows) {
+    return null
   } else {
     throw new errors.NotFoundError(`Query [${name}] failed with params [${values.join(', ')}]`)
   }
 }
 
 const db = {
-  select: async (params, forceArray = false) => {
-    return await queryDB(params, true, forceArray)
+  select: async (params, forceArray = false, okWithNoRows) => {
+    return await queryDB(params, true, forceArray, okWithNoRows)
   },
   insert: async (params, forceArray = false) => {
     return await queryDB(params, true, forceArray)

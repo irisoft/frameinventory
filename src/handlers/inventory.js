@@ -64,29 +64,115 @@ function Inventory(server, db) {
     path: `${ROOT_PATH}/:inventoryId/getProductAndCountByUPC/:upc`
   }, async function(req, res, next) {
 
+    let productId
+
     const {
       organizationId,
       inventoryId,
       upc
     } = req.params
 
-    try {
-      res.send(await db.select({
+
+    /* 1. Check for the UPC in the inventory_count table */
+    const getResultFromInventory = async (i_inventoryId, i_upc) => (
+      await db.select({
         name: 'getInventoryProductAndCountByUPC',
         text: `
           SELECT
-          	c.*,
-          	p.*
+            c.*,
+            p.*
           FROM
-          	inventory_count c INNER JOIN
-          	product p ON c.product_id = p.id
+            inventory_count c INNER JOIN
+            product p ON c.product_id = p.id
           WHERE
-          	c.inventory_id = $1 AND
-          	p.upc LIKE $2
+            c.inventory_id = $1 AND
+            p.upc LIKE $2
+          LIMIT 1
         `,
-        values: [ inventoryId, `%${upc}` ]
-      }))
-      return next()
+        values: [ i_inventoryId, `%${i_upc}` ]
+      }, false, true)
+    )
+
+    try {
+      const resultFromInventory = await getResultFromInventory(inventoryId, upc)
+
+      /* 2. If it's present, return the data */
+      if (resultFromInventory && 'upc' in resultFromInventory) {
+        res.send(resultFromInventory)
+        return next()
+
+
+      /* 3. If it's not present, we have to check for UPC in product table */
+      } else {
+        const resultFromProducts = await db.select({
+          name: 'getProductByUPC',
+          text: `
+            select
+            	*
+            from
+            	product p
+            where
+            	p.upc LIKE $2 and
+            	p.organization_id = $1
+            LIMIT 1
+          `,
+          values: [ organizationId, `%${upc}` ]
+        }, false, true)
+
+
+        /* 4. Product exists already, use the existing product_id */
+        if (resultFromProducts && 'id' in resultFromProducts && resultFromProducts.id) {
+          productId = inventoryCountResult.id
+
+
+        /* 5. If there's no product with that UPC, insert it into the product table leaving all fields blank except UPC */
+        } else {
+          productInsertResult = await db.insert({
+            name: 'insertEmptyProductFromUPC',
+            text: `
+              insert into
+              product
+                (upc, organization_id)
+              values
+                ($1, $2)
+              returning id
+            `,
+            values: [ upc, organizationId ]
+          })
+
+          if (productInsertResult && 'id' in productInsertResult && productInsertResult.id) {
+            productId = productInsertResult.id
+          }
+        }
+
+
+        if (!productId) throw new Error('Unable to SELECT or INSERT product_id')
+
+        /* 6. Then, insert into inventory_count table using the id just inserted into product table and a report_qty of 0 and manual_qty of 1. */
+        const productCountInsertResult = await db.insert({
+          name: 'insertEmptyProductCountFromUPC',
+          text: `
+            insert into
+            inventory_count
+              (inventory_id, product_id, manual_qty, report_qty)
+            values
+              ($1, $2, 0, 0)
+            returning id
+          `,
+          values: [ inventoryId, productId ]
+        })
+
+        /* 7. Finally, return the new data to the calling function */
+        if (productCountInsertResult && 'id' in productCountInsertResult && productCountInsertResult.id) {
+          const newResultFromInventory = await getResultFromInventory(inventoryId, upc)
+          if (newResultFromInventory && 'upc' in newResultFromInventory) {
+            res.send(newResultFromInventory)
+            return next()
+          } else {
+            throw new Error('Unable insert new inventory_count')
+          }
+        }
+      }
     } catch (err) {
       return next(err)
     }
