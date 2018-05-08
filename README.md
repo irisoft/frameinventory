@@ -27,7 +27,16 @@ You'll need one environment variable. You can find the value you need in the Her
 ```bash
 export DATABASE_URL="export DATABASE_URL='postgres://xxx:xxx@xxxx:xxxx/xxxx"
 ```
+### Install Dependencies
+```bash
+# Install Server Deps
+cd /some/dir/frameinventory
+yarn install
 
+# Install Client Deps
+cd client
+yarn install
+```
 ### Run It
 Switch to the new `frameinventory` subdirectory
 ```bash
@@ -35,4 +44,4 @@ cd /some/dir/frameinventory
 yarn start
 ```
 
-At this point, your browser should open automatically. 
+At this point, your browser should open automatically.

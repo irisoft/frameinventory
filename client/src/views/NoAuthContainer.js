@@ -2,8 +2,8 @@ import React from 'react'
 import { Route } from 'react-router-dom'
 import Home from './Home'
 import SignIn from './SignIn'
-import SignUp from './SignUp'
-import About from './About'
+// import SignUp from './SignUp'
+// import About from './About'
 
 function NoAuthContainer() {
   return (

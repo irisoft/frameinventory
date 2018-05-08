@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 // import { Navbar, Nav, Button, ListGroup, Row, Col } from 'reactstrap'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import Container from '../../components/Container'
 import PageHeading from '../../components/PageHeading'
 import PageFooter from '../../components/PageFooter'

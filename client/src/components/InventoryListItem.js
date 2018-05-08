@@ -8,8 +8,6 @@ import UnderArrow from '../components/UnderArrow'
 function InventoryListItem({
   id, timestamp, overCount, underCount,
 }) {
-  const overColor = overCount === 0 ? 'success' : 'warning'
-  const underColor = underCount === 0 ? 'success' : 'danger'
   const date = new Moment(timestamp)
 
   return (

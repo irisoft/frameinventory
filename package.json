@@ -13,16 +13,16 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@okta/jwt-verifier": "^0.0.11",
+    "@okta/jwt-verifier": "^0.0.12",
     "@okta/okta-sdk-nodejs": "^1.1.0",
     "concurrently": "^3.5.1",
     "pg": "^7.4.1",
-    "restify": "^6.3.4",
+    "restify": "^7.1.1",
     "restify-cors-middleware": "^1.1.0",
-    "restify-errors": "^5.0.0"
+    "restify-errors": "^6.0.0"
   },
   "devDependencies": {
-    "eslint": "^4.17.0",
+    "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1"
   }
 }

@@ -106,7 +106,7 @@ requireAndInit([
 ])
 
 // serve client as static files
-server.get(/\/?.*\//, restify.plugins.serveStatic({
+server.get('/*', restify.plugins.serveStatic({
   directory: './client/build',
   default: 'index.html',
   appendRequestPath: true
