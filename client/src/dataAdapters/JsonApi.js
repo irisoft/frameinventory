@@ -34,6 +34,20 @@ const apiMethods = {
     }
   ),
 
+  getScanLog: ({ organizationId, inventoryId, timestamp }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/getScanLog/${timestamp}`,
+      method: 'get',
+    }
+  ),
+
+  deleteScanLog: ({ organizationId, inventoryId, id }) => (
+    {
+      path: `/organization/${organizationId}/inventory/${inventoryId}/deleteScanLog/${id}`,
+      method: 'get',
+    }
+  ),
+
   getInventoryStylesDiff: ({ organizationId, inventoryId }) => (
     {
       path: `/organization/${organizationId}/inventory/${inventoryId}/getInventoryStylesDiff`,
@@ -187,6 +201,34 @@ const JsonApi = token => ({
       {
         organizationId: 1,
         inventoryId,
+      },
+      null,
+      token,
+    )
+    return result
+  },
+
+  getScanLog: async (inventoryId, timestamp) => {
+    const result = await makeApiCall(
+      'getScanLog',
+      {
+        organizationId: 1,
+        inventoryId,
+        timestamp: Math.ceil(timestamp / 1000),
+      },
+      null,
+      token,
+    )
+    return result
+  },
+
+  deleteScanLog: async (inventoryId, id) => {
+    const result = await makeApiCall(
+      'deleteScanLog',
+      {
+        organizationId: 1,
+        inventoryId,
+        id,
       },
       null,
       token,

@@ -122,7 +122,7 @@ function Inventory(server, db) {
 
         /* 4. Product exists already, use the existing product_id */
         if (resultFromProducts && 'id' in resultFromProducts && resultFromProducts.id) {
-          productId = inventoryCountResult.id
+          productId = resultFromProducts.id
 
 
         /* 5. If there's no product with that UPC, insert it into the product table leaving all fields blank except UPC */
@@ -239,6 +239,74 @@ function Inventory(server, db) {
         name: 'getInventorySummary',
         text: 'SELECT * FROM inventory_summary($1)',
         values: [ inventoryId ]
+      }, true))
+      return next()
+    } catch (err) {
+      return next(err)
+    }
+  })
+
+  server.get({
+    name: 'getScanLog',
+    path: `${ROOT_PATH}/:inventoryId/getScanLog/:timestamp`
+  }, async function(req, res, next) {
+
+    const {
+      organizationId,
+      inventoryId,
+      timestamp
+    } = req.params
+
+    try {
+      res.send(await db.select({
+        name: 'getScanLog',
+        text: `
+          select
+            l.id,
+          	l.scan_time,
+          	l.qty_diff,
+          	c.manual_qty,
+          	c.report_qty,
+          	p.upc,
+          	p.brand,
+          	p.description,
+          	p.type
+          from
+          	scan_log l inner join
+          	inventory_count c on l.product_id = c.product_id inner join
+          	product p on l.product_id = p.id
+          where
+            l.inventory_id = $1 AND
+            l.scan_time > to_timestamp($2)
+        `,
+        values: [ inventoryId, timestamp ]
+      }, true))
+      return next()
+    } catch (err) {
+      return next(err)
+    }
+  })
+
+  server.get({
+    name: 'deleteScanLog',
+    path: `${ROOT_PATH}/:inventoryId/deleteScanLog/:id`
+  }, async function(req, res, next) {
+
+    const {
+      id
+    } = req.params
+
+    try {
+      res.send(await db.select({
+        name: 'deleteScanLog',
+        text: `
+          DELETE
+          FROM
+            scan_log
+          WHERE
+            id = $1
+        `,
+        values: [ id ]
       }, true))
       return next()
     } catch (err) {

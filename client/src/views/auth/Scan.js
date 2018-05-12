@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import Moment from 'moment'
 // import { Link } from 'react-router-dom'
 // import { Navbar, Nav, Button } from 'reactstrap'
 import Scanner from '../../components/Scanner'
@@ -9,12 +10,48 @@ import RoundButton from '../../components/RoundButton'
 import BeepFail from '../../assets/beep-fail.mp3'
 import BeepSuccess from '../../assets/beep-success.mp3'
 
+class ScanLogItem extends Component {
+  handleDeleteScan = async () => {
+    const { api, item } = this.props
+    const {
+      match: {
+        params: {
+          inventoryId,
+        },
+      },
+    } = this.props
+
+    await api.deleteScanLog({ inventoryId, id: item.id })
+  }
+
+  render() {
+    const {
+      id, scan_time, upc, qty_diff, manual_qty, report_qty,
+    } = this.props.item
+
+    return (
+      <li key={`scan-log-${id}`}>
+        <div className="cf">
+          <div className="pa3 ba b--moon-gray near-black fl w-30">{Moment(scan_time).fromNow()}</div>
+          <div className="pa3 ba b--moon-gray near-black fl w-30">{upc}</div>
+          <div className="pa3 ba b--moon-gray near-black fl w-10">{qty_diff}</div>
+          <div className="pa3 ba b--moon-gray near-black fl w-10">{manual_qty}</div>
+          <div className="pa3 ba b--moon-gray near-black fl w-10">{report_qty}</div>
+          <div className="pa3 ba b--moon-gray near-black fl w-10"><button className="link" onClick={this.handleDeleteScan}>X</button></div>
+        </div>
+      </li>
+    )
+  }
+}
+
 class Scan extends Component {
   constructor(props) {
     super(props)
     this.state = {
       scannedItem: false,
       failedCode: null,
+      scanLog: [],
+      lastScanTimestamp: 0,
     }
   }
 
@@ -54,6 +91,8 @@ class Scan extends Component {
         this.setState({ scannedItem: productAndCount }, () => {
           makeReadyForTheNextOne()
         })
+
+        this.updateScanLog(inventoryId)
       })
     } else {
       this.beepFail.play()
@@ -61,6 +100,41 @@ class Scan extends Component {
         makeReadyForTheNextOne()
       })
     }
+  }
+
+  updateScanLog = async () => {
+    const { api } = this.props
+    const {
+      match: {
+        params: {
+          inventoryId,
+        },
+      },
+    } = this.props
+
+    const lastScanTimestamp = parseInt(this.state.scanLog
+      .map(logItem => (logItem.scan_time ? Moment(logItem.scan_time).valueOf() : 0))
+      .reduce((max, cur) => Math.max(max, cur), this.state.lastScanTimestamp), 10)
+
+    const scanLog = this.state.scanLog.concat(await api.getScanLog(inventoryId, lastScanTimestamp))
+
+    this.setState({
+      scanLog,
+      lastScanTimestamp,
+    })
+  }
+
+  handleDeleteScan = async (logItem) => {
+    const { api } = this.props
+    const {
+      match: {
+        params: {
+          inventoryId,
+        },
+      },
+    } = this.props
+
+    await api.deleteScanLog({ inventoryId, id: logItem.id })
   }
 
   render() {
@@ -75,7 +149,18 @@ class Scan extends Component {
     const {
       scannedItem,
       failedCode,
+      scanLog,
     } = this.state
+
+    const scanLogItemIndices = []
+    const scanLogItems = scanLog
+      .filter((v, i, a) => {
+        scanLogItemIndices.push(v.id)
+        return scanLogItemIndices.indexOf(v.id) === i
+      })
+      .reverse().map(scanLogItem => (
+        <ScanLogItem {...this.props} item={scanLogItem} />
+      ))
 
     return (
       <Container>
@@ -122,6 +207,9 @@ class Scan extends Component {
             </div>
           )
           }
+
+          <h3>Scan Log</h3>
+          <ul className="list w-100 ma0 pa0">{scanLogItems}</ul>
         </div>
         {/* <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
           <Nav className="bottom-nav">
