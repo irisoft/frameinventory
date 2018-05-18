@@ -1,8 +1,8 @@
+/* eslint-disable react/no-multi-comp */
+
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Moment from 'moment'
-// import { Link } from 'react-router-dom'
-// import { Navbar, Nav, Button } from 'reactstrap'
 import Scanner from '../../components/Scanner'
 import PageHeading from '../../components/PageHeading'
 import Container from '../../components/Container'
@@ -12,7 +12,9 @@ import BeepSuccess from '../../assets/beep-success.mp3'
 
 class ScanLogItem extends Component {
   handleDeleteScan = async () => {
-    const { api, item } = this.props
+    const {
+      api, item, onDeleteItem,
+    } = this.props
     const {
       match: {
         params: {
@@ -21,16 +23,21 @@ class ScanLogItem extends Component {
       },
     } = this.props
 
-    await api.deleteScanLog({ inventoryId, id: item.id })
+    await api.deleteScanLog(inventoryId, item.id)
+
+    if (typeof onDeleteItem === 'function') {
+      onDeleteItem(item)
+    }
   }
 
   render() {
+    /* eslint-disable camelcase, react/prop-types */
     const {
-      id, scan_time, upc, qty_diff, manual_qty, report_qty,
+      scan_time, upc, qty_diff, manual_qty, report_qty,
     } = this.props.item
 
     return (
-      <li key={`scan-log-${id}`}>
+      <li>
         <div className="cf">
           <div className="pa3 ba b--moon-gray near-black fl w-30">{Moment(scan_time).fromNow()}</div>
           <div className="pa3 ba b--moon-gray near-black fl w-30">{upc}</div>
@@ -48,8 +55,6 @@ class Scan extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      scannedItem: false,
-      failedCode: null,
       scanLog: [],
       lastScanTimestamp: 0,
     }
@@ -78,27 +83,22 @@ class Scan extends Component {
     const isValid = this.validateItem(productAndCount)
     if (isValid) {
       this.beepSuccess.play()
-      this.setState({ scannedItem: productAndCount, failedCode: null }, async () => {
-        await api.updateCount(
-          productAndCount.upc,
-          inventoryId,
-          (parseInt(productAndCount.manual_qty.toString(), 10) + 1),
-        )
 
-        productAndCount = await api
-          .getProductAndCountByUPC(productAndCount.upc, inventoryId)
+      await api.updateCount(
+        productAndCount.upc,
+        inventoryId,
+        (parseInt(productAndCount.manual_qty.toString(), 10) + 1),
+      )
 
-        this.setState({ scannedItem: productAndCount }, () => {
-          makeReadyForTheNextOne()
-        })
+      productAndCount = await api
+        .getProductAndCountByUPC(productAndCount.upc, inventoryId)
 
-        this.updateScanLog(inventoryId)
-      })
+      makeReadyForTheNextOne()
+
+      this.updateScanLog(inventoryId)
     } else {
       this.beepFail.play()
-      this.setState({ scannedItem: false, failedCode: result }, () => {
-        makeReadyForTheNextOne()
-      })
+      makeReadyForTheNextOne()
     }
   }
 
@@ -116,7 +116,8 @@ class Scan extends Component {
       .map(logItem => (logItem.scan_time ? Moment(logItem.scan_time).valueOf() : 0))
       .reduce((max, cur) => Math.max(max, cur), this.state.lastScanTimestamp), 10)
 
-    const scanLog = this.state.scanLog.concat(await api.getScanLog(inventoryId, lastScanTimestamp))
+    const newScan = await api.getScanLog(inventoryId, lastScanTimestamp)
+    const scanLog = newScan.concat(this.state.scanLog)
 
     this.setState({
       scanLog,
@@ -124,17 +125,10 @@ class Scan extends Component {
     })
   }
 
-  handleDeleteScan = async (logItem) => {
-    const { api } = this.props
-    const {
-      match: {
-        params: {
-          inventoryId,
-        },
-      },
-    } = this.props
-
-    await api.deleteScanLog({ inventoryId, id: logItem.id })
+  handleDeleteScan = async (item) => {
+    this.setState({
+      scanLog: this.state.scanLog.filter(e => e !== item),
+    })
   }
 
   render() {
@@ -147,21 +141,20 @@ class Scan extends Component {
     } = this.props
 
     const {
-      scannedItem,
-      failedCode,
       scanLog,
     } = this.state
 
     const scanLogItemIndices = []
     const scanLogItems = scanLog
-      .filter((v, i, a) => {
+      .filter((v, i) => {
         scanLogItemIndices.push(v.id)
         return scanLogItemIndices.indexOf(v.id) === i
       })
-      .reverse().map(scanLogItem => (
-        <ScanLogItem {...this.props} item={scanLogItem} />
+      .map(scanLogItem => (
+        <ScanLogItem key={`scan-log-${scanLogItem.id}`} {...this.props} onDeleteItem={this.handleDeleteScan} item={scanLogItem} />
       ))
 
+    /* eslint-disable jsx-a11y/media-has-caption */
     return (
       <Container>
         <RoundButton
@@ -171,53 +164,9 @@ class Scan extends Component {
         <PageHeading>Scan</PageHeading>
         <Scanner onDetected={this.handleDetected} />
         <div className="padded">
-          { scannedItem ? (
-            <div className="container">
-              <div className="row text">
-                <div className="col-6">
-                  Product
-                </div>
-                <div className="col-3 text-right">
-                  Report
-                </div>
-                <div className="col-3 text-right">
-                  Manual
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-6">
-                  <h4>{scannedItem.brand}</h4>
-                  <div>{scannedItem.upc}</div>
-                  <div>{scannedItem.description}</div>
-                </div>
-                <div className="col-3 text-right">
-                  {scannedItem.report_qty}
-                </div>
-                <div className="col-3 text-right">
-                  {scannedItem.manual_qty}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
-              { failedCode
-                && <i className="text-center" style={{ display: 'block' }}>Couldn&apos;t find a product for <b>{failedCode}</b></i>
-              }
-              <i className="text-center" style={{ display: 'block' }}>Type or paste a barcode and press <b>[Enter]</b>.</i>
-            </div>
-          )
-          }
-
           <h3>Scan Log</h3>
           <ul className="list w-100 ma0 pa0">{scanLogItems}</ul>
         </div>
-        {/* <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
-          <Nav className="bottom-nav">
-            <Link to={`/auth/inventory/${inventoryId}`}>
-          <Button color="secondary" size="md"><i className="fas fa-th-list" /> Back to List</Button>
-            </Link>
-          </Nav>
-        </Navbar> */}
 
         <audio ref={(el) => {
           this.beepSuccess = el

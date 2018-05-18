@@ -278,6 +278,8 @@ function Inventory(server, db) {
           where
             l.inventory_id = $1 AND
             l.scan_time > to_timestamp($2)
+          order by
+            l.scan_time desc
         `,
         values: [ inventoryId, timestamp ]
       }, true))
