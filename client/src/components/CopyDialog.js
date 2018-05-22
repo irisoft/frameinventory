@@ -5,12 +5,13 @@ import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
 import RoundButton from '../components/RoundButton'
 import copyIcon from '../assets/copy-icon.png'
+import InventoryFrameDiffCollection from '../dao/InventoryFrameDiffCollection'
 
 class FrameDiffDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: [],
+      data: new InventoryFrameDiffCollection(),
       copied: false,
     }
   }
@@ -59,10 +60,10 @@ class FrameDiffDialog extends Component {
       return s
     }
 
-    const rows = data.map(rowMapper)
-    const text = data.map(textMapper).join('\n')
+    const rows = data.items.map(rowMapper)
+    const text = data.items.map(textMapper).join('\n')
 
-    const hasQty = Array.isArray(data) && data.length > 0 && 'qty' in data[0]
+    const hasQty = Array.isArray(data) && data.items.length > 0 && 'qty' in data.items[0]
 
     return (
       isOpen

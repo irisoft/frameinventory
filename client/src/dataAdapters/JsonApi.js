@@ -1,4 +1,6 @@
 import request from 'request-json'
+import InventoryFrameDiffCollection from '../dao/InventoryFrameDiffCollection'
+import InventoryStyleDiffCollection from '../dao/InventoryStyleDiffCollection'
 
 const client = request.createClient(window.location.origin)
 
@@ -246,7 +248,10 @@ const JsonApi = token => ({
       null,
       token,
     )
-    return { over, under }
+    return {
+      over: new InventoryFrameDiffCollection(over),
+      under: new InventoryFrameDiffCollection(under),
+    }
   },
 
   getInventoryStylesDiff: async (inventoryId) => {
@@ -259,7 +264,7 @@ const JsonApi = token => ({
       null,
       token,
     )
-    return result
+    return new InventoryStyleDiffCollection(result)
   },
 
   getInventoryProductsAndCounts: async (inventoryId, filter = 'all') => {
