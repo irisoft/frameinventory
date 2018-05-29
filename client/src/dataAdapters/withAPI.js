@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { withAuth } from '@okta/okta-react'
-import JsonApi from './JsonApi'
+// import JsonApi from './JsonApi'
+import FirestoreApi from './FirestoreApi'
 
 function withAPI(WrappedComponent) {
   class API extends Component {
@@ -21,7 +22,7 @@ function withAPI(WrappedComponent) {
     async checkAuthentication() {
       const authenticated = await this.props.auth.isAuthenticated()
       if (authenticated !== this.state.authenticated) {
-        this.api = JsonApi(await this.props.auth.getAccessToken())
+        this.api = FirestoreApi(await this.props.auth.getAccessToken())
         this.setState({ authenticated })
       }
     }

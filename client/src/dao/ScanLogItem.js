@@ -6,7 +6,7 @@ class ScanLogItem extends TuposModel {
     this.id = json.id
     this.scanTime = json.scan_time
     this.qtyDiff = json.qty_diff
-    this.manualQty = json.manual_qty
+    this.scannedQty = json.scannedQty
     this.reportQty = json.report_qty
     this.upc = json.upc
     this.brand = json.brand
@@ -38,12 +38,12 @@ class ScanLogItem extends TuposModel {
     super.setterForNumbers(qtyDiff, 'qtyDiff')
   }
 
-  get manualQty() {
-    return this._manualQty
+  get scannedQty() {
+    return this._scannedQty
   }
 
-  set manualQty(manualQty) {
-    super.setterForNumbers(manualQty, 'manualQty')
+  set scannedQty(scannedQty) {
+    super.setterForNumbers(scannedQty, 'scannedQty')
   }
 
   get reportQty() {

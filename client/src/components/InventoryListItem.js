@@ -43,7 +43,7 @@ function InventoryListItem({
 }
 
 InventoryListItem.propTypes = {
-  id: PropTypes.number,
+  id: PropTypes.string,
   timestamp: PropTypes.string,
   overCount: PropTypes.number,
   underCount: PropTypes.number,

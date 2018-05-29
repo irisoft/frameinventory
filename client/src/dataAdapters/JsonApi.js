@@ -150,12 +150,12 @@ const JsonApi = token => ({
     return result
   },
 
-  updateCount: async (upc, inventoryId, manualQty) => {
+  updateCount: async (upc, inventoryId, scannedQty) => {
     const result = await makeApiCall('updateInventoryCount', {
       organizationId: 1,
       inventoryId,
       upc,
-    }, { manualQty }, token)
+    }, { scannedQty }, token)
     return result
   },
 

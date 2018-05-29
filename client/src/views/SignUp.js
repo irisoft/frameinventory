@@ -16,17 +16,17 @@ class SignUp extends Component {
     }
   }
 
-  handleSubmit = (e) => {
-    const { api } = this.props
-    const {
-      orgName,
-      firstName,
-      lastName,
-      email,
-      password,
-    } = this.state
-    e.preventDefault()
-    api.createOrganization(orgName, firstName, lastName, email, password)
+  handleSubmit = () => {
+    // const { api } = this.props
+    // const {
+    //   orgName,
+    //   firstName,
+    //   lastName,
+    //   email,
+    //   password,
+    // } = this.state
+    // e.preventDefault()
+    // api.createOrganization(orgName, firstName, lastName, email, password)
   }
 
   handleChange = (e) => {

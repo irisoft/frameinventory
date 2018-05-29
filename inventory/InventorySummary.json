@@ -1,0 +1,14 @@
+{
+  "start_date":"2018-04-15T20:19:40.574Z",
+  "report_style_count": 1059,
+  "report_frame_count": 931,
+  "report_value": 51691.19,
+  "scan_style_count": 225,
+  "scan_frame_count": 294,
+  "scan_value": 12548.64,
+  "style_diff": 834,
+  "frame_diff": 637,
+  "value_diff": 39142.55,
+  "styles_under": 821,
+  "styles_over": 74
+}

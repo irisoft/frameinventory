@@ -36,12 +36,17 @@ class ListInventories extends Component {
 
   render() {
     const { inventories } = this.state
-    const inventoriesItems = Array.isArray(inventories) && inventories.map((inventory) => {
+    const inventoriesItems = Array.isArray(inventories) && inventories.map((inventorySnapshot) => {
+      const { id } = inventorySnapshot
+      console.log('inventorySnapshot', inventorySnapshot)
+      const inventory = inventorySnapshot.data()
+      console.log('inventory', inventory)
       const {
-        id,
-        start_date: startDateRaw,
-        under_count: underCountRaw,
-        over_count: overCountRaw,
+        startedAt: startDateRaw,
+        counts: {
+          under: underCountRaw,
+          over: overCountRaw,
+        },
       } = inventory
 
       const overCount = parseInt(overCountRaw.toString(), 10)
@@ -51,7 +56,7 @@ class ListInventories extends Component {
         <InventoryListItem
           key={id}
           id={id}
-          timestamp={startDateRaw}
+          timestamp={startDateRaw.toDate().getTime()}
           underCount={underCount}
           overCount={overCount}
         />

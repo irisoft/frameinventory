@@ -56,7 +56,7 @@ class UploadReport extends Component {
               salesPrices: row['Sales Price'],
               sellinPrice: row['Sell-in Price'],
               reportQty: parseInt(row.Quantity.toString(), 10),
-              manualQty: 0,
+              scannedQty: 0,
             }
             products.push(product)
           })

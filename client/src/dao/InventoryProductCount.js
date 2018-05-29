@@ -6,7 +6,7 @@ class InventoryProductCount extends TuposModel {
     this.id = json.id
     this.inventoryId = json.inventory_id
     this.productId = json.product_id
-    this.manualQty = json.manual_qty
+    this.scannedQty = json.scannedQty
     this.reportQty = json.report_qty
     this.upc = json.upc
     this.brand = json.brand
@@ -45,12 +45,12 @@ class InventoryProductCount extends TuposModel {
   }
 
 
-  get manualQty() {
-    return this._manualQty
+  get scannedQty() {
+    return this._scannedQty
   }
 
-  set manualQty(manualQty) {
-    super.setterForNumbers(manualQty, 'manualQty')
+  set scannedQty(scannedQty) {
+    super.setterForNumbers(scannedQty, 'scannedQty')
   }
 
 

@@ -37,11 +37,11 @@ class RowRenderer extends React.Component {
   getRowBackground = () => (this.props.idx % 2 ? 'green' : 'blue');
 
   getClassName = () => {
-    const { report_qty: reportQty, manual_qty: manualQty } = this.props.row
+    const { report_qty: reportQty, scannedQty } = this.props.row
     const oddRow = this.props.idx % 2
-    if (reportQty === manualQty) return `even-row ${oddRow && 'odd-row'} near-black`
-    if (reportQty > manualQty) return `under-row ${oddRow && 'odd-row'} near-black`
-    if (reportQty < manualQty) return `over-row ${oddRow && 'odd-row'} near-black`
+    if (reportQty === scannedQty) return `even-row ${oddRow && 'odd-row'} near-black`
+    if (reportQty > scannedQty) return `under-row ${oddRow && 'odd-row'} near-black`
+    if (reportQty < scannedQty) return `over-row ${oddRow && 'odd-row'} near-black`
   }
 
   render() {
@@ -60,7 +60,7 @@ class RowRenderer extends React.Component {
 RowRenderer.propTypes = {
   row: PropTypes.shape({
     report_qty: PropTypes.number,
-    manual_qty: PropTypes.number,
+    scannedQty: PropTypes.number,
   }).isRequired,
 }
 
@@ -108,7 +108,7 @@ class ViewInventory extends Component {
         }, {
           key: 'report_qty', name: 'MIMs Qty', sortable: true, width: 90, cellClass: 'tr',
         }, {
-          key: 'manual_qty', name: 'Scan Qty', sortable: true, width: 90, cellClass: 'tr', editable: true,
+          key: 'scannedQty', name: 'Scan Qty', sortable: true, width: 90, cellClass: 'tr', editable: true,
         }, {
           key: 'over_under', formatter: PercentCompleteFormatter, name: '', sortable: true, width: 90, cellClass: 'status-indicator',
         },
@@ -150,9 +150,9 @@ class ViewInventory extends Component {
     const { api, match: { params: { inventoryId } } } = this.props
     this.setState({
       inventoryProductsAndCounts: await api
-        .getInventoryProductsAndCounts(parseInt(inventoryId.toString(), 10)),
+        .getInventoryProductsAndCounts(inventoryId),
       inventorySummary: await api
-        .getInventorySummary(parseInt(inventoryId.toString(), 10)),
+        .getInventorySummary(inventoryId),
     })
   }
 
@@ -178,14 +178,14 @@ class ViewInventory extends Component {
     const updatedCopy = Object.assign({}, updated)
     const { api } = this.props
 
-    if (typeof updatedCopy === 'object' && typeof updatedCopy.manual_qty === 'string') {
-      updatedCopy.manual_qty = parseInt(updatedCopy.manual_qty, 10)
+    if (typeof updatedCopy === 'object' && typeof updatedCopy.scannedQty === 'string') {
+      updatedCopy.scannedQty = parseInt(updatedCopy.scannedQty, 10)
     }
 
     const promises = []
     for (let i = fromRow; i <= toRow; i += 1) {
       const { inventory_id: inventoryId, upc } = inventoryProductsAndCounts[i]
-      promises.push(api.updateCount(upc, inventoryId, updatedCopy.manual_qty))
+      promises.push(api.updateCount(upc, inventoryId, updatedCopy.scannedQty))
     }
     await Promise.all(promises)
 
@@ -384,7 +384,7 @@ class ViewInventory extends Component {
             />
           </div>
           <h1 className="f2 normal mr3 mv0">Inventory Report</h1>
-          <h2 className="f5 normal flex-auto mb0 mt2">{new Moment(inventorySummary[0].start_date).format('dddd, MMMM Do')}</h2>
+          {/* <h2 className="f5 normal flex-auto mb0 mt2">{new Moment(inventorySummary[0].start_date).format('dddd, MMMM Do')}</h2> */}
           <RoundButton to={`/auth/scan/${inventoryId}`} color="isgreen" textColor="white" label="Scan" icon={UploadIcon} />
         </div>
         {pageContents}
