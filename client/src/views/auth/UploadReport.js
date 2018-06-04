@@ -10,6 +10,7 @@ import ExcelIcon from '../../assets/excel-dark.png'
 import RoundButton from '../../components/RoundButton'
 import UploadIcon from '../../assets/upload-icon.png'
 import FolderIcon from '../../assets/folder-open-dark.png'
+import InventoryCount from '../../dao/InventoryCount'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -45,23 +46,24 @@ class UploadReport extends Component {
         const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
 
         api.createNewInventory().then(async ({ id: inventoryId }) => {
-          const products = []
+          const promises = []
 
           json.forEach((row) => {
-            const product = {
+            const product = new InventoryCount({
               upc: row['EAN/UPC'],
               description: row['Material Description'],
               brand: row['Product Brand'],
               type: row['Product Type'],
-              salesPrices: row['Sales Price'],
-              sellinPrice: row['Sell-in Price'],
+              salesPrice: row['Sales Price'],
+              sellInPrice: row['Sell-in Price'],
               reportQty: parseInt(row.Quantity.toString(), 10),
               scannedQty: 0,
-            }
-            products.push(product)
+            }, 'po6IONOcohOE9a8U06yH', inventoryId)
+
+            promises.push(product.save())
           })
 
-          await api.insertProducts(inventoryId, products)
+          await Promise.all(promises)
           this.setState({ readyToRedirect: true, inventoryId })
         })
       }

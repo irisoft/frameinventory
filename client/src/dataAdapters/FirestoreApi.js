@@ -84,25 +84,25 @@ const JsonApi = token => ({
     return querySnapshot.docs
   },
 
-  insertProducts: async (inventoryId, products) => {
-    const promises = []
-    const countsRef = firestore.collection('organizations')
-      .doc('po6IONOcohOE9a8U06yH')
-      .collection('inventories')
-      .doc(inventoryId)
-      .collection('counts')
-
-    products.forEach((product) => {
-      const { upc } = product
-      try {
-        promises.push(countsRef.doc(upc).set(product))
-      } catch (e) {
-        console.error('Error uploading Product', e)
-      }
-    })
-
-    await Promise.all(promises)
-  },
+  // insertProducts: async (inventoryId, products) => {
+  //   const promises = []
+  //   const countsRef = firestore.collection('organizations')
+  //     .doc('po6IONOcohOE9a8U06yH')
+  //     .collection('inventories')
+  //     .doc(inventoryId)
+  //     .collection('counts')
+  //
+  //   products.forEach((product) => {
+  //     const { upc } = product
+  //     try {
+  //       promises.push(countsRef.doc(upc).set(product))
+  //     } catch (e) {
+  //       console.error('Error uploading Product', e)
+  //     }
+  //   })
+  //
+  //   await Promise.all(promises)
+  // },
 
   // createOrganization: async (orgName, firstName, lastName, email, password) => {
   //   const result = await makeApiCall('createOrganization', null, {
