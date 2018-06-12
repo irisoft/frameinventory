@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import Moment from 'moment'
 import ReactDataGrid, { Row } from 'react-data-grid'
 import Spinner from 'react-spinkit'
+import Inventory from '../../dao/Inventory'
 import Container from '../../components/Container'
 import RoundButton from '../../components/RoundButton'
 import UploadIcon from '../../assets/upload-icon.png'
@@ -148,7 +149,9 @@ class ViewInventory extends Component {
 
   async fetchData() {
     const { api, match: { params: { inventoryId } } } = this.props
+    const inventory = await Inventory.load('po6IONOcohOE9a8U06yH', inventoryId)
     this.setState({
+      inventory,
       inventoryProductsAndCounts: await api
         .getInventoryProductsAndCounts(inventoryId),
       inventorySummary: await api
@@ -201,6 +204,7 @@ class ViewInventory extends Component {
       dialogInventoryStyleDiffOpen,
       readyToTransition,
       reportIsReady,
+      inventory,
     } = this.state
 
     const {
@@ -239,7 +243,8 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Styles (UPCs)</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventorySummary[0].scan_style_count}</span>
+                  {/* <span className="pa2 dib">{inventorySummary[0].scan_style_count}</span> */}
+                  <span className="pa2 dib">{inventory.report.fifo.styles}</span>
                 </div>
               </div>
               <div className="cf">
@@ -247,7 +252,8 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Frames</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventorySummary[0].scan_frame_count}</span>
+                  {/* <span className="pa2 dib">{inventorySummary[0].scan_frame_count}</span> */}
+                  <span className="pa2 dib">{inventory.report.fifo.frames}</span>
                 </div>
               </div>
               <div className="cf">
@@ -255,7 +261,8 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Value</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventorySummary[0].scan_value}</span>
+                  {/* <span className="pa2 dib">{inventorySummary[0].scan_value}</span> */}
+                  <span className="pa2 dib">{inventory.report.fifo.value}</span>
                 </div>
               </div>
             </div>
@@ -266,7 +273,7 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Styles (UPCs)</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventorySummary[0].report_style_count}</span>
+                  <span className="pa2 dib">{inventory.report.mims.styles}</span>
                 </div>
               </div>
               <div className="cf">
@@ -274,7 +281,7 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Frames</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventorySummary[0].report_frame_count}</span>
+                  <span className="pa2 dib">{inventory.report.mims.frames}</span>
                 </div>
               </div>
               <div className="cf">
@@ -282,7 +289,7 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Value</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventorySummary[0].report_value}</span>
+                  <span className="pa2 dib">{inventory.report.mims.value}</span>
                 </div>
               </div>
             </div>

@@ -17,6 +17,13 @@ class Inventory extends TuposFirestoreModel {
     this.inventoryId = inventoryId
   }
 
+  static async load(organizationId, inventoryId) {
+    if (!organizationId || organizationId === '') throw new Error('Property `organizationId` is required for Inventory')
+    if (!inventoryId || inventoryId === '') throw new Error('Property `inventoryId` is required for Inventory')
+    const data = await TuposFirestoreModel.load(`/organizations/${organizationId}/inventories/${inventoryId}`)
+    return new Inventory(data, organizationId, inventoryId)
+  }
+
   getDataObject() {
     return {
       counts: this.counts,
@@ -29,8 +36,7 @@ class Inventory extends TuposFirestoreModel {
 
   collectionPath() {
     if (this.organizationId === '') throw new Error('Property `organizationId` is required for Inventory')
-    if (this.inventoryId === '') throw new Error('Property `inventoryId` is required for Inventory')
-    return `/organizations/${this.organizationId}/inventories/${this.inventoryId}`
+    return `/organizations/${this.organizationId}/inventories`
   }
 
   get id() {

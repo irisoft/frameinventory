@@ -17,34 +17,8 @@ const JsonApi = token => ({
         .doc('po6IONOcohOE9a8U06yH')
         .collection('inventories')
         .add({
-          counts: {
-            even: 0,
-            over: 0,
-            under: 0,
-          },
           status: 'active',
           locationId: 'organizations/po6IONOcohOE9a8U06yH/locations/Oea2rlsW1hnN3vUmOObU',
-          report: {
-            diff: {
-              frames: 0,
-              styles: 0,
-              value: 0,
-            },
-            fifo: {
-              frames: 0,
-              styles: 0,
-              value: 0,
-            },
-            mims: {
-              frames: 0,
-              styles: 0,
-              value: 0,
-            },
-            styles: {
-              over: 0,
-              under: 0,
-            },
-          },
           startedAt: new Date(),
         })
     } catch (e) {

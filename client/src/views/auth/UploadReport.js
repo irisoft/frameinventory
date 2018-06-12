@@ -46,24 +46,17 @@ class UploadReport extends Component {
         const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
 
         api.createNewInventory().then(async ({ id: inventoryId }) => {
-          const promises = []
-
-          json.forEach((row) => {
-            const product = new InventoryCount({
-              upc: row['EAN/UPC'],
-              description: row['Material Description'],
-              brand: row['Product Brand'],
-              type: row['Product Type'],
-              salesPrice: row['Sales Price'],
-              sellInPrice: row['Sell-in Price'],
-              reportQty: parseInt(row.Quantity.toString(), 10),
-              scannedQty: 0,
-            }, 'po6IONOcohOE9a8U06yH', inventoryId)
-
-            promises.push(product.save())
-          })
-
-          await Promise.all(promises)
+          const products = json.map(row => new InventoryCount({
+            upc: row['EAN/UPC'],
+            description: row['Material Description'],
+            brand: row['Product Brand'],
+            type: row['Product Type'],
+            salesPrice: row['Sales Price'],
+            sellInPrice: row['Sell-in Price'],
+            reportQty: row.Quantity,
+            scannedQty: 0,
+          }, 'po6IONOcohOE9a8U06yH', inventoryId))
+          await InventoryCount.saveBatch(products)
           this.setState({ readyToRedirect: true, inventoryId })
         })
       }

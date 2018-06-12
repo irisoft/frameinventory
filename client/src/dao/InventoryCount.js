@@ -35,8 +35,8 @@ class InventoryCount extends TuposFirestoreModel {
   collectionPath() {
     if (this.organizationId === '') throw new Error('Property `organizationId` is required for InventoryCount')
     if (this.inventoryId === '') throw new Error('Property `inventoryId` is required for InventoryCount')
-    if (this.upc === '') throw new Error('Property `upc` is required for InventoryCount')
-    return `/organizations/${this.organizationId}/inventories/${this.inventoryId}/counts/${this.upc}`
+    // if (this.upc === '') throw new Error('Property `upc` is required for InventoryCount')
+    return `/organizations/${this.organizationId}/inventories/${this.inventoryId}/counts`
   }
 
   get id() {
