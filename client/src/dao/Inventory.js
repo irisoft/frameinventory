@@ -1,15 +1,14 @@
 import TuposFirestoreModel from './base/tupos-firestore-model'
 import InventoryCountSummary from './InventoryCountSummary'
 import InventorySummary from './InventorySummary'
+import InventoryCount from './InventoryCount'
 import setDate from './base/setters/date'
 import setString from './base/setters/string'
 
 class Inventory extends TuposFirestoreModel {
   constructor(json, organizationId = null, inventoryId = null) {
     super(json)
-    this.counts = json.counts
     this.locationId = json.locationId
-    this.report = json.report
     this.startedAt = json.startedAt
     this.status = json.status
 
@@ -21,14 +20,32 @@ class Inventory extends TuposFirestoreModel {
     if (!organizationId || organizationId === '') throw new Error('Property `organizationId` is required for Inventory')
     if (!inventoryId || inventoryId === '') throw new Error('Property `inventoryId` is required for Inventory')
     const data = await TuposFirestoreModel.load(`/organizations/${organizationId}/inventories/${inventoryId}`)
-    return new Inventory(data, organizationId, inventoryId)
+    const inventory = new Inventory(data, organizationId, inventoryId)
+    await inventory.registerReportWatcher(null, false)
+    return inventory
+  }
+
+  static async loadCollection(organizationId, wheres = []) {
+    if (!organizationId || organizationId === '') throw new Error('Argument `organizationId` is required for Inventory.loadCollection')
+    const data = await TuposFirestoreModel.loadCollection(`/organizations/${organizationId}/inventories`, wheres)
+    if (Array.isArray(data)) {
+      return Promise.all(data.map(async (inventorySnapshot) => {
+        const inventory = new Inventory(
+          inventorySnapshot.data(),
+          organizationId,
+          inventorySnapshot.id,
+        )
+        await inventory.registerReportWatcher(null, false)
+        return inventory
+      }))
+    }
+    return null
   }
 
   getDataObject() {
     return {
-      counts: this.counts,
       locationId: this.locationId,
-      report: this.report,
+      report: this.report.getDataObject(),
       startedAt: this.startedAt,
       status: this.status,
     }
@@ -37,6 +54,38 @@ class Inventory extends TuposFirestoreModel {
   collectionPath() {
     if (this.organizationId === '') throw new Error('Property `organizationId` is required for Inventory')
     return `/organizations/${this.organizationId}/inventories`
+  }
+
+  registerReportWatcher(watchFunction, isRealtime = false) {
+    return new Promise((resolve) => {
+      const reportPath = `organizations/${this.organizationId}/inventories/${this.inventoryId}/report`
+      return TuposFirestoreModel.registerDatabaseWatcher(reportPath, (json) => {
+        this.report = json
+        if (typeof watchFunction === 'function') {
+          watchFunction(this.report)
+        }
+        resolve()
+      }, isRealtime)
+    })
+  }
+
+  async getItems() {
+    return InventoryCount.loadCollection(this.organizationId, this.inventoryId)
+  }
+
+  async getStylesDiff() {
+    const wheres = [
+      ['mimsQty', '==', 0],
+      ['fifoQty', '>', 0],
+    ]
+
+    const styles = await InventoryCount.loadCollection(
+      this.organizationId,
+      this.inventoryId,
+      wheres,
+    )
+
+    return styles
   }
 
   get id() {
@@ -57,14 +106,6 @@ class Inventory extends TuposFirestoreModel {
 
   set inventoryId(inventoryId) {
     this._inventoryId = setString(inventoryId, 'inventoryId')
-  }
-
-  get counts() {
-    return this._counts
-  }
-
-  set counts(counts) {
-    this._counts = new InventoryCountSummary(counts)
   }
 
   get locationId() {

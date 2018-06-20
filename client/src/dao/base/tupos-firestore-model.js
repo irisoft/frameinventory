@@ -3,6 +3,8 @@
 /* eslint-disable no-console */
 
 const firestore = firebase.firestore()
+const database = firebase.database()
+
 const firestoreSettings = {
   timestampsInSnapshots: true,
 }
@@ -18,6 +20,22 @@ class TuposFirestoreModel {
       console.error('Could not locate doc:', docPath)
     } catch (error) {
       console.error('Unable to load:', docPath, error)
+    }
+    return null
+  }
+
+  static async loadCollection(collectionPath, wheres = []) {
+    try {
+      let collectionQuery = firestore.collection(collectionPath)
+      if (Array.isArray(wheres)) {
+        wheres.forEach(([fieldPath, opStr, value]) => {
+          collectionQuery = collectionQuery.where(fieldPath, opStr, value)
+        })
+      }
+      const collectionSnapshot = await collectionQuery.get()
+      return collectionSnapshot.docs
+    } catch (error) {
+      console.error('Unable to load collection:', collectionPath, error)
     }
     return null
   }
@@ -54,6 +72,33 @@ class TuposFirestoreModel {
     closeBatch()
 
     return Promise.all(promises)
+  }
+
+  static getDatabaseRef(path) {
+    if (!path || typeof path !== 'string') {
+      throw new Error('Path required for getDatabaseRef')
+    }
+    return database.ref(path)
+  }
+
+  static registerDatabaseWatcher(path, watchFunction, isRealtime = false) {
+    if (!path || !watchFunction || typeof path !== 'string' || typeof watchFunction !== 'function') {
+      throw new Error('Path and WatchFunction are required for registerDatabaseWatcher')
+    }
+
+    const ref = TuposFirestoreModel.getDatabaseRef(path)
+
+    if (isRealtime) {
+      ref.on('value', (snapshot) => {
+        watchFunction(snapshot.val())
+      })
+    } else {
+      ref.once('value', (snapshot) => {
+        watchFunction(snapshot.val())
+      })
+    }
+
+    return true
   }
 
   collectionPath() {

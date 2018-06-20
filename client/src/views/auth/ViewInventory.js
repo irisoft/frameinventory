@@ -23,8 +23,6 @@ class RowRenderer extends React.Component {
   };
 
   setScrollLeft = (scrollBy) => {
-    // if you want freeze columns to work, you need to make sure you
-    // implement this as a pass-through
     this.row.setScrollLeft(scrollBy)
   };
 
@@ -38,18 +36,14 @@ class RowRenderer extends React.Component {
   getRowBackground = () => (this.props.idx % 2 ? 'green' : 'blue');
 
   getClassName = () => {
-    const { report_qty: reportQty, scannedQty } = this.props.row
+    const { mimsQty, fifoQty } = this.props.row
     const oddRow = this.props.idx % 2
-    if (reportQty === scannedQty) return `even-row ${oddRow && 'odd-row'} near-black`
-    if (reportQty > scannedQty) return `under-row ${oddRow && 'odd-row'} near-black`
-    if (reportQty < scannedQty) return `over-row ${oddRow && 'odd-row'} near-black`
+    if (mimsQty === fifoQty) return `even-row ${oddRow && 'odd-row'} near-black`
+    if (mimsQty > fifoQty) return `under-row ${oddRow && 'odd-row'} near-black`
+    if (mimsQty < fifoQty) return `over-row ${oddRow && 'odd-row'} near-black`
   }
 
   render() {
-    // here we are just changing the style
-    // but we could replace this with anything we liked, cards, images, etc
-    // usually though it will just be a matter of wrapping a div, and then
-    // calling back through to the grid
     return (
       <div className={this.getClassName()}>
         <Row ref={(node) => { this.row = node }} {...this.props} />
@@ -60,8 +54,8 @@ class RowRenderer extends React.Component {
 
 RowRenderer.propTypes = {
   row: PropTypes.shape({
-    report_qty: PropTypes.number,
-    scannedQty: PropTypes.number,
+    mimsQty: PropTypes.number,
+    fifoQty: PropTypes.number,
   }).isRequired,
 }
 
@@ -85,13 +79,13 @@ class ViewInventory extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      inventoryProductsAndCounts: [],
-      inventorySummary: [{}],
+      inventoryItems: [],
       dialogInventoryStyleDiffOpen: false,
       FramesOverDialogOpen: false,
       FramesUnderDialogOpen: false,
-      reportIsReady: false,
       readyToTransition: false,
+      report: null,
+      inventory: null,
     }
 
     this.fetchData = this.fetchData.bind(this)
@@ -107,11 +101,11 @@ class ViewInventory extends Component {
         }, {
           key: 'description', name: 'Description', sortable: true,
         }, {
-          key: 'report_qty', name: 'MIMs Qty', sortable: true, width: 90, cellClass: 'tr',
+          key: 'mimsQty', name: 'MIMs Qty', sortable: true, width: 90, cellClass: 'tr',
         }, {
-          key: 'scannedQty', name: 'Scan Qty', sortable: true, width: 90, cellClass: 'tr', editable: true,
+          key: 'fifoQty', name: 'Scan Qty', sortable: true, width: 90, cellClass: 'tr', editable: true,
         }, {
-          key: 'over_under', formatter: PercentCompleteFormatter, name: '', sortable: true, width: 90, cellClass: 'status-indicator',
+          key: 'overUnder', formatter: PercentCompleteFormatter, name: '', sortable: true, width: 90, cellClass: 'status-indicator',
         },
       ]
 
@@ -131,41 +125,39 @@ class ViewInventory extends Component {
     }
 
     const {
-      inventoryProductsAndCounts,
-      inventorySummary,
+      inventoryItems,
       readyToTransition,
     } = this.state
 
     if (!readyToTransition) {
-      const ready = isArrayValid(inventoryProductsAndCounts) && isArrayValid(inventorySummary)
+      const ready = isArrayValid(inventoryItems)
       if (ready) {
         this.setState({ readyToTransition: true })
-        setTimeout(() => {
-          this.setState({ reportIsReady: true })
-        }, 1000)
       }
     }
   }
 
   async fetchData() {
-    const { api, match: { params: { inventoryId } } } = this.props
+    const { match: { params: { inventoryId } } } = this.props
     const inventory = await Inventory.load('po6IONOcohOE9a8U06yH', inventoryId)
     this.setState({
       inventory,
-      inventoryProductsAndCounts: await api
-        .getInventoryProductsAndCounts(inventoryId),
-      inventorySummary: await api
-        .getInventorySummary(inventoryId),
+      inventoryItems: await inventory.getItems(),
     })
+    inventory.registerReportWatcher((report) => {
+      this.setState({
+        report,
+      })
+    }, true)
   }
 
   rowGetter = (i) => {
-    const { inventoryProductsAndCounts } = this.state
-    return inventoryProductsAndCounts[i]
+    const { inventoryItems } = this.state
+    return inventoryItems[i]
   }
 
   handleGridSort = (sortColumn, sortDirection) => {
-    const { inventoryProductsAndCounts } = this.state
+    const { inventoryItems } = this.state
     const comparer = (a, b) => {
       if (sortDirection === 'ASC') {
         return (a[sortColumn] > b[sortColumn]) ? 1 : -1
@@ -173,38 +165,37 @@ class ViewInventory extends Component {
         return (a[sortColumn] < b[sortColumn]) ? 1 : -1
       }
     }
-    this.setState({ inventoryProductsAndCounts: inventoryProductsAndCounts.sort(comparer) })
+    this.setState({ inventoryItems: inventoryItems.sort(comparer) })
   }
 
-  handleGridRowsUpdated = async ({ fromRow, toRow, updated }) => {
-    const inventoryProductsAndCounts = this.state.inventoryProductsAndCounts.slice()
-    const updatedCopy = Object.assign({}, updated)
-    const { api } = this.props
-
-    if (typeof updatedCopy === 'object' && typeof updatedCopy.scannedQty === 'string') {
-      updatedCopy.scannedQty = parseInt(updatedCopy.scannedQty, 10)
-    }
-
-    const promises = []
-    for (let i = fromRow; i <= toRow; i += 1) {
-      const { inventory_id: inventoryId, upc } = inventoryProductsAndCounts[i]
-      promises.push(api.updateCount(upc, inventoryId, updatedCopy.scannedQty))
-    }
-    await Promise.all(promises)
-
-    this.fetchData()
-  }
+  // handleGridRowsUpdated = async ({ fromRow, toRow, updated }) => {
+  //   const inventoryItems = this.state.inventoryItems.slice()
+  //   const updatedCopy = Object.assign({}, updated)
+  //   const { api } = this.props
+  //
+  //   if (typeof updatedCopy === 'object' && typeof updatedCopy.fifoQty === 'string') {
+  //     updatedCopy.fifoQty = parseInt(updatedCopy.fifoQty, 10)
+  //   }
+  //
+  //   const promises = []
+  //   for (let i = fromRow; i <= toRow; i += 1) {
+  //     const { inventory_id: inventoryId, upc } = inventoryItems[i]
+  //     promises.push(api.updateCount(upc, inventoryId, updatedCopy.fifoQty))
+  //   }
+  //   await Promise.all(promises)
+  //
+  //   this.fetchData()
+  // }
 
   render() {
     const {
-      inventoryProductsAndCounts,
-      inventorySummary,
+      inventoryItems,
       FramesOverDialogOpen,
       FramesUnderDialogOpen,
       dialogInventoryStyleDiffOpen,
       readyToTransition,
-      reportIsReady,
       inventory,
+      report,
     } = this.state
 
     const {
@@ -217,8 +208,8 @@ class ViewInventory extends Component {
     } = this.props
 
     let pageContents
-
-    if (!reportIsReady) {
+    const readyToRoll = (inventory && typeof inventory === 'object' && 'report' in inventory && report && typeof report === 'object' && 'counts' in report)
+    if (!readyToRoll /*! reportIsReady */) {
       pageContents = (
         <section className={`mv3 fade-in ${readyToTransition && 'fade-out'}`}>
           <div className="dropzone">
@@ -243,7 +234,6 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Styles (UPCs)</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  {/* <span className="pa2 dib">{inventorySummary[0].scan_style_count}</span> */}
                   <span className="pa2 dib">{inventory.report.fifo.styles}</span>
                 </div>
               </div>
@@ -252,7 +242,6 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Frames</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  {/* <span className="pa2 dib">{inventorySummary[0].scan_frame_count}</span> */}
                   <span className="pa2 dib">{inventory.report.fifo.frames}</span>
                 </div>
               </div>
@@ -261,7 +250,6 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Value</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  {/* <span className="pa2 dib">{inventorySummary[0].scan_value}</span> */}
                   <span className="pa2 dib">{inventory.report.fifo.value}</span>
                 </div>
               </div>
@@ -297,45 +285,44 @@ class ViewInventory extends Component {
             <div className="bg-light-gray br2 pa3 w-third">
               <div className="fl w-100 pa2">
                 <button className="pv2 gray f5 bn bg-near-white br-pill ph4 pointer dim outline-0" onClick={() => { this.setState({ dialogInventoryStyleDiffOpen: true }) }}>
-                  { inventorySummary[0].style_diff > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
-                  {Math.abs(inventorySummary[0].style_diff)} Styles { inventorySummary[0].style_diff > 0 ? 'More' : 'Less' }
+                  { inventory.report.diff.styles > 0 ? <OverArrow /> : <UnderArrow /> }&nbsp;
+                  {Math.abs(inventory.report.diff.styles)} Styles { inventory.report.diff.styles > 0 ? 'More' : 'Less' }
                 </button>
               </div>
               <div className="fl w-100 pa2">
                 <button
                   className="pv2 gray f5 bn bg-near-white br-pill br--left ph4 pointer dim outline-0 w-50"
                   onClick={() => { this.setState({ FramesOverDialogOpen: true }) }}
-                  title={`${inventorySummary[0].styles_over} styles with more frames than MIMs`}
+                  title={`${inventory.report.counts.over} styles with more frames than MIMs`}
                 >
                   <OverArrow />&nbsp;
-                  {inventorySummary[0].styles_over}
+                  {inventory.report.counts.over}
                 </button>
 
                 <button
                   className="pv2 gray f5 bn bg-near-white br-pill br--right ph4 pointer dim outline-0 w-50"
                   onClick={() => { this.setState({ FramesUnderDialogOpen: true }) }}
-                  title={`${inventorySummary[0].styles_under} styles with fewer frames than MIMs`}
+                  title={`${inventory.report.counts.under} styles with fewer frames than MIMs`}
                 >
                   <UnderArrow />&nbsp;
-                  {inventorySummary[0].styles_under}
+                  {inventory.report.counts.under}
                 </button>
               </div>
               <div className="fl w-100 pa2 gray f6">
-                <span className="pa2 dib">Difference in value: <span className="f5 near-black">{inventorySummary[0].value_diff}</span></span>
+                <span className="pa2 dib">Difference in value: <span className="f5 near-black">{inventory.report.diff.value}</span></span>
               </div>
             </div>
           </div>
 
           <div className="max-height" style={{ marginRight: -90 }}>
-            {(Array.isArray(inventoryProductsAndCounts) && inventoryProductsAndCounts.length > 0) &&
+            {(Array.isArray(inventoryItems) && inventoryItems.length > 0) &&
               <ReactDataGrid
                 columns={this.columns(false)}
                 rowGetter={this.rowGetter}
-                rowsCount={inventoryProductsAndCounts.length}
+                rowsCount={inventoryItems.length}
                 minHeight={1000}
                 onGridSort={this.handleGridSort}
                 enableCellSelect
-                onGridRowsUpdated={this.handleGridRowsUpdated}
                 rowRenderer={RowRenderer}
                 rowHeight={80}
               />
@@ -345,13 +332,10 @@ class ViewInventory extends Component {
           <CopyDialog
             isOpen={dialogInventoryStyleDiffOpen}
             onClose={() => { this.setState({ dialogInventoryStyleDiffOpen: false }) }}
-            status={inventorySummary[0].style_diff > 0 ? 'over' : 'under'}
-            fetchData={async () => {
-              const data = await api.getInventoryStylesDiff(inventoryId)
-              return data
-            }}
+            status={inventory.report.diff.styles > 0 ? 'over' : 'under'}
+            fetchData={async () => inventory.getStylesDiff()}
             name="StyleDiffDialog"
-            title={`${Math.abs(inventorySummary[0].style_diff)} ${(inventorySummary[0].style_diff > 0) ? 'more styles than MIMs' : 'less styles than MIMs'}`}
+            title={`${Math.abs(inventory.report.diff.styles)} ${(inventory.report.diff.styles > 0) ? 'more styles than MIMs' : 'less styles than MIMs'}`}
           />
 
           <CopyDialog
@@ -363,7 +347,7 @@ class ViewInventory extends Component {
               return over
             }}
             name="FramesOverDialog"
-            title={`${inventorySummary[0].styles_over} styles with more frames than MIMs`}
+            title={`${inventory.report.counts.over} styles with more frames than MIMs`}
           />
 
           <CopyDialog
@@ -375,7 +359,7 @@ class ViewInventory extends Component {
               return under
             }}
             name="FramesUnderDialog"
-            title={`${inventorySummary[0].styles_under} styles with fewer frames than MIMs`}
+            title={`${inventory.report.counts.under} styles with fewer frames than MIMs`}
           />
         </div>
       )
@@ -391,7 +375,7 @@ class ViewInventory extends Component {
             />
           </div>
           <h1 className="f2 normal mr3 mv0">Inventory Report</h1>
-          {/* <h2 className="f5 normal flex-auto mb0 mt2">{new Moment(inventorySummary[0].start_date).format('dddd, MMMM Do')}</h2> */}
+          <h2 className="f5 normal flex-auto mb0 mt2">{readyToRoll ? new Moment(inventory.startedAt).format('dddd, MMMM Do') : ''}</h2>
           <RoundButton to={`/auth/scan/${inventoryId}`} color="isgreen" textColor="white" label="Scan" icon={UploadIcon} />
         </div>
         {pageContents}

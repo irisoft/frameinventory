@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 export default function setterForDates(newValue, name) {
-  if ('toDate' in newValue && typeof newValue.toDate === 'function') {
+  if (typeof newValue === 'object' && 'toDate' in newValue && typeof newValue.toDate === 'function') {
     return newValue.toDate()
   }
 

@@ -9,7 +9,7 @@ const firestoreSettings = {
 }
 firestore.settings(firestoreSettings)
 
-const JsonApi = token => ({
+const JsonApi = () => ({
   createNewInventory: async () => {
     let ref
     try {
@@ -27,7 +27,7 @@ const JsonApi = token => ({
     return ref
   },
 
-  updateCount: async (upc, inventoryId, scannedQty) => {
+  updateCount: async (upc, inventoryId, fifoQty) => {
     let ref
     try {
       ref = await firestore.collection('organizations')
@@ -37,7 +37,7 @@ const JsonApi = token => ({
         .collection('counts')
         .doc(upc)
         .update({
-          scannedQty,
+          fifoQty,
         })
     } catch (e) {
       console.error('Error updating Count', e)
@@ -45,18 +45,18 @@ const JsonApi = token => ({
     return ref
   },
 
-  getAllInventories: async () => {
-    let querySnapshot
-    try {
-      querySnapshot = await firestore.collection('organizations')
-        .doc('po6IONOcohOE9a8U06yH')
-        .collection('inventories')
-        .get()
-    } catch (e) {
-      console.error('Error getting list of Inventories', e)
-    }
-    return querySnapshot.docs
-  },
+  // getAllInventories: async () => {
+  //   let querySnapshot
+  //   try {
+  //     querySnapshot = await firestore.collection('organizations')
+  //       .doc('po6IONOcohOE9a8U06yH')
+  //       .collection('inventories')
+  //       .get()
+  //   } catch (e) {
+  //     console.error('Error getting list of Inventories', e)
+  //   }
+  //   return querySnapshot.docs
+  // },
 
   // insertProducts: async (inventoryId, products) => {
   //   const promises = []
@@ -102,10 +102,10 @@ const JsonApi = token => ({
       console.error(e)
     }
 
-    return await ref.get()
+    return ref.get()
   },
 
-  getInventorySummary: async (inventoryId) => {
+  getInventorySummary: async () => {
     // const result = await makeApiCall(
     //   'getInventorySummary',
     //   {
@@ -134,7 +134,7 @@ const JsonApi = token => ({
     return querySnapshot.docs
   },
 
-  deleteScanLog: async (inventoryId, id) => {
+  deleteScanLog: async () => {
     // const result = await makeApiCall(
     //   'deleteScanLog',
     //   {
@@ -148,7 +148,7 @@ const JsonApi = token => ({
     // return result
   },
 
-  getInventoryFramesDiff: async (inventoryId) => {
+  getInventoryFramesDiff: async () => {
     // const [over, under] = await makeApiCall(
     //   'getInventoryFramesDiff',
     //   {
@@ -164,7 +164,7 @@ const JsonApi = token => ({
     // }
   },
 
-  getInventoryStylesDiff: async (inventoryId) => {
+  getInventoryStylesDiff: async () => {
     // const result = await makeApiCall(
     //   'getInventoryStylesDiff',
     //   {
@@ -177,7 +177,7 @@ const JsonApi = token => ({
     // return new InventoryStyleDiffCollection(result)
   },
 
-  getInventoryProductsAndCounts: async (inventoryId, filter = 'all') => {
+  getInventoryProductsAndCounts: async (inventoryId) => {
     let querySnapshot
     try {
       querySnapshot = await firestore.collection('organizations')

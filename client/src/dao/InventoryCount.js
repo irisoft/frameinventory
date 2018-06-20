@@ -8,9 +8,9 @@ class InventoryCount extends TuposFirestoreModel {
     super()
     this.brand = json.brand
     this.description = json.description
-    this.reportQty = json.reportQty
+    this.mimsQty = json.mimsQty
     this.salesPrice = json.salesPrice
-    this.scannedQty = json.scannedQty
+    this.fifoQty = json.fifoQty
     this.sellInPrice = json.sellInPrice
     this.type = json.type
     this.upc = json.upc
@@ -19,13 +19,35 @@ class InventoryCount extends TuposFirestoreModel {
     this.inventoryId = inventoryId
   }
 
+  static async load(organizationId, inventoryId, upc) {
+    if (!organizationId || organizationId === '') throw new Error('Argument `organizationId` is required for InventoryCount')
+    if (!inventoryId || inventoryId === '') throw new Error('Argument `inventoryId` is required for InventoryCount')
+    if (!upc || upc === '') throw new Error('Argument `upc` is required for InventoryCount')
+    const data = await TuposFirestoreModel.load(`/organizations/${organizationId}/inventories/${inventoryId}/counts/${upc}`)
+    return new InventoryCount(data, organizationId, inventoryId)
+  }
+
+  static async loadCollection(organizationId, inventoryId, wheres = []) {
+    if (!organizationId || organizationId === '') throw new Error('Argument `organizationId` is required for InventoryCount.loadCollection')
+    if (!inventoryId || inventoryId === '') throw new Error('Argument `inventoryId` is required for InventoryCount.loadCollection')
+    const data = await TuposFirestoreModel.loadCollection(`/organizations/${organizationId}/inventories/${inventoryId}/counts`, wheres)
+    if (Array.isArray(data)) {
+      return data.map(inventoryCountSnapshot => new InventoryCount(
+        inventoryCountSnapshot.data(),
+        organizationId,
+        inventoryId,
+      ))
+    }
+    return null
+  }
+
   getDataObject() {
     return {
       brand: this.brand,
       description: this.description,
-      reportQty: this.reportQty,
+      mimsQty: this.mimsQty,
       salesPrice: this.salesPrice,
-      scannedQty: this.scannedQty,
+      fifoQty: this.fifoQty,
       sellInPrice: this.sellInPrice,
       type: this.type,
       upc: this.upc,
@@ -41,6 +63,10 @@ class InventoryCount extends TuposFirestoreModel {
 
   get id() {
     return this.upc
+  }
+
+  get overUnder() {
+    return (this.fifoQty - this.mimsQty)
   }
 
   get organizationId() {
@@ -75,12 +101,12 @@ class InventoryCount extends TuposFirestoreModel {
     this._description = setString(description, 'description')
   }
 
-  get reportQty() {
-    return this._reportQty
+  get mimsQty() {
+    return this._mimsQty
   }
 
-  set reportQty(reportQty) {
-    this._reportQty = setNumber(reportQty, 'reportQty')
+  set mimsQty(mimsQty) {
+    this._mimsQty = setNumber(mimsQty, 'mimsQty')
   }
 
   get salesPrice() {
@@ -91,12 +117,12 @@ class InventoryCount extends TuposFirestoreModel {
     this._salesPrice = setNumber(salesPrice, 'salesPrice', true, 10)
   }
 
-  get scannedQty() {
-    return this._scannedQty
+  get fifoQty() {
+    return this._fifoQty
   }
 
-  set scannedQty(scannedQty) {
-    this._scannedQty = setNumber(scannedQty, 'scannedQty')
+  set fifoQty(fifoQty) {
+    this._fifoQty = setNumber(fifoQty, 'fifoQty')
   }
 
   get sellInPrice() {

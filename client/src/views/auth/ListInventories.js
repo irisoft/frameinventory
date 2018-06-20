@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-// import { Navbar, Nav, Button, ListGroup, Row, Col } from 'reactstrap'
-// import { Link } from 'react-router-dom'
 import Container from '../../components/Container'
 import PageHeading from '../../components/PageHeading'
 import PageFooter from '../../components/PageFooter'
 import InventoryListItem from '../../components/InventoryListItem'
 import RoundButton from '../../components/RoundButton'
+import Inventory from '../../dao/Inventory'
 import UploadIcon from '../../assets/upload-icon.png'
 
 class ListInventories extends Component {
@@ -19,8 +18,9 @@ class ListInventories extends Component {
   }
 
   async componentDidMount() {
-    const { api } = this.props
-    this.setState({ inventories: await api.getAllInventories() })
+    this.setState({
+      inventories: await Inventory.loadCollection('po6IONOcohOE9a8U06yH'),
+    })
   }
 
   componentDidUpdate() {
@@ -36,32 +36,15 @@ class ListInventories extends Component {
 
   render() {
     const { inventories } = this.state
-    const inventoriesItems = Array.isArray(inventories) && inventories.map((inventorySnapshot) => {
-      const { id } = inventorySnapshot
-      console.log('inventorySnapshot', inventorySnapshot)
-      const inventory = inventorySnapshot.data()
-      console.log('inventory', inventory)
-      const {
-        startedAt: startDateRaw,
-        counts: {
-          under: underCountRaw,
-          over: overCountRaw,
-        },
-      } = inventory
-
-      const overCount = parseInt(overCountRaw.toString(), 10)
-      const underCount = parseInt(underCountRaw.toString(), 10)
-
-      return (
-        <InventoryListItem
-          key={id}
-          id={id}
-          timestamp={startDateRaw.toDate().getTime()}
-          underCount={underCount}
-          overCount={overCount}
-        />
-      )
-    })
+    const inventoriesItems = Array.isArray(inventories) && inventories.map(inventory => (
+      <InventoryListItem
+        key={inventory.id}
+        id={inventory.id}
+        timestamp={inventory.startedAt.getTime()}
+        underCount={inventory.report.counts.under}
+        overCount={inventory.report.counts.over}
+      />
+    ))
 
     if (this.state.authenticated === null) return null
 
@@ -87,19 +70,6 @@ class ListInventories extends Component {
           <RoundButton to="/auth" color="isgreen" textColor="white" label="Upload New MIMs" icon={UploadIcon} />
         </PageFooter>
 
-        {/* <ListGroup>
-
-        </ListGroup>
-
-        <Navbar light color="inverse" fixed="bottom" className="justify-content-between">
-          <Nav className="bottom-nav">
-            <Link to="/auth/upload">
-              <Button block color="success">
-                <i className="fas fa-upload" />&nbsp; Upload New Report
-              </Button>
-            </Link>
-          </Nav>
-        </Navbar> */}
       </Container>
     )
   }
@@ -111,12 +81,10 @@ ListInventories.propTypes = {
     login: PropTypes.func,
     isAuthenticated: PropTypes.func,
   }),
-  api: PropTypes.shape({}),
 }
 
 ListInventories.defaultProps = {
   auth: null,
-  api: null,
 }
 
 export default ListInventories

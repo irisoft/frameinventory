@@ -33,7 +33,7 @@ class ScanLogItem extends Component {
   render() {
     /* eslint-disable camelcase, react/prop-types */
     const {
-      scan_time, upc, qty_diff, scannedQty, report_qty,
+      scan_time, upc, qty_diff, fifoQty, report_qty,
     } = this.props.item
 
     return (
@@ -42,7 +42,7 @@ class ScanLogItem extends Component {
           <div className="pa3 ba b--moon-gray near-black fl w-30">{Moment(scan_time).fromNow()}</div>
           <div className="pa3 ba b--moon-gray near-black fl w-30">{upc}</div>
           <div className="pa3 ba b--moon-gray near-black fl w-10">{qty_diff}</div>
-          <div className="pa3 ba b--moon-gray near-black fl w-10">{scannedQty}</div>
+          <div className="pa3 ba b--moon-gray near-black fl w-10">{fifoQty}</div>
           <div className="pa3 ba b--moon-gray near-black fl w-10">{report_qty}</div>
           <div className="pa3 ba b--moon-gray near-black fl w-10"><button className="link" onClick={this.handleDeleteScan}>X</button></div>
         </div>
@@ -87,7 +87,7 @@ class Scan extends Component {
       await api.updateCount(
         productAndCount.upc,
         inventoryId,
-        (parseInt(productAndCount.scannedQty.toString(), 10) + 1),
+        (parseInt(productAndCount.fifoQty.toString(), 10) + 1),
       )
 
       productAndCount = await api

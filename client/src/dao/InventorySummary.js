@@ -1,18 +1,36 @@
 import InventorySummaryItem from './InventorySummaryItem'
+import InventoryCountSummary from './InventoryCountSummary'
 
 class InventorySummary {
-  constructor(json) {
-    this.diff = json.diff
-    this.mims = json.mims
-    this.fifo = json.fifo
+  constructor(json = {}) {
+    if (json && typeof json === 'object') {
+      this.counts = json.counts
+      this.diff = json.diff
+      this.mims = json.mims
+      this.fifo = json.fifo
+    } else {
+      this.counts = 0
+      this.diff = 0
+      this.mims = 0
+      this.fifo = 0
+    }
   }
 
   toObject() {
     return {
-      diff: this.diff,
-      mims: this.mims,
-      fifo: this.fifo,
+      counts: this.counts.getDataObject(),
+      diff: this.diff.getDataObject(),
+      mims: this.mims.getDataObject(),
+      fifo: this.fifo.getDataObject(),
     }
+  }
+
+  get counts() {
+    return this._counts
+  }
+
+  set counts(counts) {
+    this._counts = new InventoryCountSummary(counts)
   }
 
   get diff() {

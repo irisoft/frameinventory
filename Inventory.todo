@@ -5,10 +5,32 @@ Trying to get everything ready to sell at Pearle trade show on April 28th
 ☐ Change database structure to support mutliple Okta users per ORGANIZATION
 ☐ Change login to look up Organization when logging in
 ☐ Change sign up form to support Org+Users model
-☐ Upgrade Heroku account to minimal production level
+✔ Upgrade Heroku account to minimal production level @done(2018-06-18 22:38)
 ☐ Integrate with Stripe API to support subscription / sign up
 ☐ Use react-snapshot (or whatever works best) to get cached copies of certain pages for SEO
 ✔ Import `react-dropzone` and support dragging+dropping files to upload @done(2018-04-10 01:53)
 ✔ Create HOC to replace `dataAdapter/JsonApi` and simplify passing of token to API @done(2018-03-22 11:36)
 ✔ Build custom sign in form against Okta @done(2018-03-22 12:00)
 ✔ Build custom sign up form against Okta @done(2018-03-22 16:27)
+
+
+
+✔ Create a RTDB model for syncing report counts (with option for RT or OnceOnly fetch) @done(2018-06-18 00:14)
+✔ Add a method to the Inventory model that fetches the report model on request @done(2018-06-18 00:14)
+
+☐ Get Inventory Report page wired up to new data models
+✔  - top panels @done(2018-06-18 00:14)
+✔  - table grid @done(2018-06-18 00:14)
+☐  - popups
+
+☐ Create FS model for Scan Log
+
+ViewInventory.js
+LINE 337: const data = await api.getInventoryStylesDiff(inventoryId)
+✔ Change query to populate list for CopyDialog (where mimsQty = 0 and fifoQty > 0) @done(2018-06-18 22:39)
+
+TuposeFirestoreModel
+✔ Add `wheres` option to loadCollection static method @done(2018-06-18 22:39)
+
+☐ Calculation of Value sums is using int instead of float
+☐ Need to format values as dollars

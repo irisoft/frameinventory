@@ -11,7 +11,7 @@ class FrameDiffDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: new InventoryFrameDiffCollection(),
+      data: false,
       copied: false,
     }
   }
@@ -60,10 +60,10 @@ class FrameDiffDialog extends Component {
       return s
     }
 
-    const rows = data.items.map(rowMapper)
-    const text = data.items.map(textMapper).join('\n')
+    const rows = Array.isArray(data) && data.map(rowMapper)
+    const text = Array.isArray(data) && data.map(textMapper).join('\n')
 
-    const hasQty = Array.isArray(data) && data.items.length > 0 && 'qty' in data.items[0]
+    const hasQty = Array.isArray(data) && data.length > 0 && 'qty' in data[0]
 
     return (
       isOpen

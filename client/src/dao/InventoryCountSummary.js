@@ -1,10 +1,10 @@
 import setNumber from './base/setters/number'
 
 class InventoryCountSummary {
-  constructor(json) {
-    this.over = json.over
-    this.under = json.under
-    this.even = json.even
+  constructor(json = {}) {
+    this.over = json.over || 0
+    this.under = json.under || 0
+    this.even = json.even || 0
   }
 
   toObject() {

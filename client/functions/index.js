@@ -31,7 +31,7 @@ function updateSummary({
   after
 }) {
   const promises = []
-  const isNew = (typeof before === 'undefined' || !('reportQty' in before))
+  const isNew = (typeof before === 'undefined' || !('mimsQty' in before))
   const counterKeys = {
     'report/counts/over': 0,
     'report/counts/under': 0,
@@ -50,9 +50,9 @@ function updateSummary({
 
   counterKeys['report/counts/total'] += 1
 
-  if (after.scannedQty > after.reportQty) {
+  if (after.fifoQty > after.mimsQty) {
     counterKeys['report/counts/over'] += 1
-  } else if (after.scannedQty < after.reportQty) {
+  } else if (after.fifoQty < after.mimsQty) {
     counterKeys['report/counts/under'] += 1
   } else {
     counterKeys['report/counts/even'] += 1
@@ -60,31 +60,31 @@ function updateSummary({
 
   if (!isNew) {
     counterKeys['report/counts/total'] -= 1
-    if (before.scannedQty > before.reportQty) {
+    if (before.fifoQty > before.mimsQty) {
       counterKeys['report/counts/over'] -= 1
-    } else if (before.scannedQty < before.reportQty) {
+    } else if (before.fifoQty < before.mimsQty) {
       counterKeys['report/counts/under'] -= 1
     } else {
       counterKeys['report/counts/even'] -= 1
     }
   }
 
-  if (after.scannedQty > 0 && (isNew || before.scannedQty <= 0)) counterKeys['report/fifo/styles'] += 1
-  if (after.reportQty > 0 && (isNew || before.reportQty <= 0)) counterKeys['report/mims/styles'] += 1
+  if (after.fifoQty > 0 && (isNew || before.fifoQty <= 0)) counterKeys['report/fifo/styles'] += 1
+  if (after.mimsQty > 0 && (isNew || before.mimsQty <= 0)) counterKeys['report/mims/styles'] += 1
 
   if (!isNew) {
-    counterKeys['report/fifo/frames'] -= before.scannedQty
-    counterKeys['report/mims/frames'] -= before.reportQty
+    counterKeys['report/fifo/frames'] -= before.fifoQty
+    counterKeys['report/mims/frames'] -= before.mimsQty
 
-    counterKeys['report/fifo/value'] -= (before.sellInPrice * before.scannedQty)
-    counterKeys['report/mims/value'] -= (before.sellInPrice * before.reportQty)
+    counterKeys['report/fifo/value'] -= (before.sellInPrice * before.fifoQty)
+    counterKeys['report/mims/value'] -= (before.sellInPrice * before.mimsQty)
   }
 
-  counterKeys['report/fifo/frames'] += after.scannedQty
-  counterKeys['report/mims/frames'] += after.reportQty
+  counterKeys['report/fifo/frames'] += after.fifoQty
+  counterKeys['report/mims/frames'] += after.mimsQty
 
-  counterKeys['report/fifo/value'] += (after.sellInPrice * after.scannedQty)
-  counterKeys['report/mims/value'] += (after.sellInPrice * after.reportQty)
+  counterKeys['report/fifo/value'] += (after.sellInPrice * after.fifoQty)
+  counterKeys['report/mims/value'] += (after.sellInPrice * after.mimsQty)
 
   counterKeys['report/diff/frames'] = counterKeys['report/fifo/frames'] - counterKeys['report/mims/frames']
   counterKeys['report/diff/styles'] = counterKeys['report/fifo/styles'] - counterKeys['report/mims/styles']

@@ -53,8 +53,8 @@ class UploadReport extends Component {
             type: row['Product Type'],
             salesPrice: row['Sales Price'],
             sellInPrice: row['Sell-in Price'],
-            reportQty: row.Quantity,
-            scannedQty: 0,
+            mimsQty: row.Quantity,
+            fifoQty: 0,
           }, 'po6IONOcohOE9a8U06yH', inventoryId))
           await InventoryCount.saveBatch(products)
           this.setState({ readyToRedirect: true, inventoryId })
