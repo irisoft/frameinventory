@@ -1,5 +1,4 @@
 import TuposFirestoreModel from './base/tupos-firestore-model'
-import InventoryCountSummary from './InventoryCountSummary'
 import InventorySummary from './InventorySummary'
 import InventoryCount from './InventoryCount'
 import setDate from './base/setters/date'

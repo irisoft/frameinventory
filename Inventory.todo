@@ -23,7 +23,7 @@ Trying to get everything ready to sell at Pearle trade show on April 28th
 ✔  - table grid @done(2018-06-18 00:14)
 ☐  - popups
 
-☐ Create FS model for Scan Log
+✔ Create FS model for Scan Log @done(2018-06-19 23:25)
 
 ViewInventory.js
 LINE 337: const data = await api.getInventoryStylesDiff(inventoryId)
@@ -32,5 +32,13 @@ LINE 337: const data = await api.getInventoryStylesDiff(inventoryId)
 TuposeFirestoreModel
 ✔ Add `wheres` option to loadCollection static method @done(2018-06-18 22:39)
 
-☐ Calculation of Value sums is using int instead of float
-☐ Need to format values as dollars
+✔ Calculation of Value sums is using int instead of float @done(2018-06-20 22:58)
+✔ Need to format values as dollars @done(2018-06-20 22:58)
+
+
+☐ Change Tupos model to support watchable collection with RT updates
+☐ Modify scan log page to allow RT updates on ScanLog list that shows up on page
+☐ Possibly limit scan log query to 500 most recent (or scans today? per day?)
+☐ Change cloud function for ScanLog to detect deletes and decrement fifoQty
+☐ Change Tupos model to support delete
+☐ Change ScanLog page to allow deletes

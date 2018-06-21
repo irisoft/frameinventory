@@ -250,7 +250,7 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Value</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventory.report.fifo.value}</span>
+                  <span className="pa2 dib">${inventory.report.fifo.value.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -277,7 +277,7 @@ class ViewInventory extends Component {
                   <span className="pa2 dib">Value</span>
                 </div>
                 <div className="fl w-50 pa2 tr near-black f5">
-                  <span className="pa2 dib">{inventory.report.mims.value}</span>
+                  <span className="pa2 dib">${inventory.report.mims.value.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -309,7 +309,7 @@ class ViewInventory extends Component {
                 </button>
               </div>
               <div className="fl w-100 pa2 gray f6">
-                <span className="pa2 dib">Difference in value: <span className="f5 near-black">{inventory.report.diff.value}</span></span>
+                <span className="pa2 dib">Difference in value: <span className="f5 near-black">${inventory.report.diff.value.toFixed(2)}</span></span>
               </div>
             </div>
           </div>

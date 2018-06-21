@@ -17,11 +17,20 @@ function parseCounter(value) {
   return numericValue
 }
 
+function parseCurrency(value) {
+  let numericValue = parseFloat(value)
+  if (Number.isNaN(numericValue)) {
+    numericValue = 0.0
+  }
+  return numericValue
+}
+
 function incrementCounter(path, increment) {
+  const parseFunction = (path.split('/').slice(-1)[0] === 'value') ? parseCurrency : parseCounter
   return admin
     .database()
     .ref(path)
-    .transaction(counter => parseCounter(counter) + parseCounter(increment))
+    .transaction(counter => parseFunction(counter) + parseFunction(increment))
 }
 
 function updateSummary({
@@ -39,13 +48,13 @@ function updateSummary({
     'report/counts/total': 0,
     'report/fifo/frames': 0,
     'report/fifo/styles': 0,
-    'report/fifo/value': 0,
+    'report/fifo/value': 0.0,
     'report/mims/frames': 0,
     'report/mims/styles': 0,
-    'report/mims/value': 0,
+    'report/mims/value': 0.0,
     'report/diff/frames': 0,
     'report/diff/styles': 0,
-    'report/diff/value': 0
+    'report/diff/value': 0.0
   }
 
   counterKeys['report/counts/total'] += 1
@@ -127,10 +136,10 @@ exports.updateQtyFromScanLog = functions.firestore
     } = context.params
 
     const isNew = !change.before.exists && change.after.exists
-    // const isDelete = change.before.exists && !change.after.exists
+    const isDelete = change.before.exists && !change.after.exists
 
-    if (isNew) {
-      const { upc } = change.after.data()
+    const incrementFifoQty = (data, increment) => {
+      const { upc } = data
       try {
         const inventoryCountPath = `/organizations/${organizationId}/inventories/${inventoryId}/counts/${upc}`
         const inventoryCountRef = admin.firestore().doc(inventoryCountPath)
@@ -142,18 +151,28 @@ exports.updateQtyFromScanLog = functions.firestore
               throw new Error("InventoryCount doc doesn't exist.")
             }
 
-            const fifoQty = inventoryCountDoc.data().fifoQty + 1
+            const fifoQty = inventoryCountDoc.data().fifoQty + increment
             return transaction.update(inventoryCountRef, { fifoQty })
           })
         }).then(() => {
           console.log('Successfully updated:', organizationId, inventoryId, upc)
+          return null
         }).catch((e) => {
           console.warn('Error updating InventoryCount (1):', e.toString(), organizationId, inventoryId, upc)
+          return null
         })
       } catch (e) {
         console.warn('Error updating InventoryCount (2):', e.toString(), organizationId, inventoryId, upc)
         return false
       }
+    }
+
+    if (isNew) {
+      return incrementFifoQty(change.after.data(), 1)
+    }
+
+    if (isDelete) {
+      return incrementFifoQty(change.before.data(), -1)
     }
   })
 

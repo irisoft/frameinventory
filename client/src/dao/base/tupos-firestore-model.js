@@ -24,12 +24,19 @@ class TuposFirestoreModel {
     return null
   }
 
-  static async loadCollection(collectionPath, wheres = []) {
+  static async loadCollection(collectionPath, wheres = [], watchFunction = null) {
     try {
       let collectionQuery = firestore.collection(collectionPath)
+
       if (Array.isArray(wheres)) {
         wheres.forEach(([fieldPath, opStr, value]) => {
           collectionQuery = collectionQuery.where(fieldPath, opStr, value)
+        })
+      }
+
+      if (typeof watchFunction === 'function') {
+        return collectionQuery.onSnapshot((collectionSnapshot) => {
+          watchFunction(collectionSnapshot.docChanges())
         })
       }
       const collectionSnapshot = await collectionQuery.get()
@@ -124,6 +131,14 @@ class TuposFirestoreModel {
       return firestore.collection(this.collectionPath()).add(this.getDataObject())
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  delete() {
+    try {
+      return this.firestoreRef().delete()
+    } catch (e) {
+      console.error(`Error deleting document: ${e.toString()}`)
     }
   }
 }
