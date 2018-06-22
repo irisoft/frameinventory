@@ -87,6 +87,34 @@ class Inventory extends TuposFirestoreModel {
     return styles
   }
 
+  async getUnder() {
+    const wheres = [
+      ['overUnder', '<', 0],
+    ]
+
+    const styles = await InventoryCount.loadCollection(
+      this.organizationId,
+      this.inventoryId,
+      wheres,
+    )
+
+    return styles
+  }
+
+  async getOver() {
+    const wheres = [
+      ['overUnder', '>', 0],
+    ]
+
+    const styles = await InventoryCount.loadCollection(
+      this.organizationId,
+      this.inventoryId,
+      wheres,
+    )
+
+    return styles
+  }
+
   get id() {
     return this.inventoryId
   }

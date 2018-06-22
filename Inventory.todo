@@ -21,7 +21,6 @@ Trying to get everything ready to sell at Pearle trade show on April 28th
 ☐ Get Inventory Report page wired up to new data models
 ✔  - top panels @done(2018-06-18 00:14)
 ✔  - table grid @done(2018-06-18 00:14)
-☐  - popups
 
 ✔ Create FS model for Scan Log @done(2018-06-19 23:25)
 
@@ -36,9 +35,16 @@ TuposeFirestoreModel
 ✔ Need to format values as dollars @done(2018-06-20 22:58)
 
 
-☐ Change Tupos model to support watchable collection with RT updates
-☐ Modify scan log page to allow RT updates on ScanLog list that shows up on page
+✔ Change Tupos model to support watchable collection with RT updates @done(2018-06-20 22:59)
+✔ Modify scan log page to allow RT updates on ScanLog list that shows up on page @done(2018-06-20 22:59)
 ☐ Possibly limit scan log query to 500 most recent (or scans today? per day?)
-☐ Change cloud function for ScanLog to detect deletes and decrement fifoQty
-☐ Change Tupos model to support delete
-☐ Change ScanLog page to allow deletes
+✔ Change cloud function for ScanLog to detect deletes and decrement fifoQty @done(2018-06-20 22:59)
+✔ Change Tupos model to support delete @done(2018-06-20 22:59)
+✔ Change ScanLog page to allow deletes @done(2018-06-20 22:59)
+
+
+✔ Clean up code on Scan view @done(2018-06-21 21:26)
+☐ Clean up UI on Scan view (make scan log look presentable)
+✔ Popups!! @done(2018-06-21 23:01)
+✔ Handle Scan of Invalid barcode by adding new product @done(2018-06-21 23:01)
+✔ Standardize logging of cloud functions for easy troubleshooting + readability + terseness (one line per invocation?) @done(2018-06-21 22:17)

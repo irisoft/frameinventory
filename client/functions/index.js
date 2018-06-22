@@ -6,7 +6,7 @@ const admin = require('firebase-admin')
 try {
   admin.initializeApp()
 } catch (e) {
-  console.log('Could not init admin:', e)
+  console.error('Could not init admin:', e.toString())
 }
 
 function parseCounter(value) {
@@ -36,6 +36,7 @@ function incrementCounter(path, increment) {
 function updateSummary({
   organizationId,
   inventoryId,
+  upc,
   before,
   after
 }) {
@@ -103,15 +104,29 @@ function updateSummary({
     promises.push(incrementCounter(`organizations/${organizationId}/inventories/${inventoryId}/${counterKey}`, counterKeys[counterKey]))
   })
 
-  return Promise.all(promises)
+  return Promise.all(promises).then(() => {
+    console.log(
+      organizationId,
+      inventoryId,
+      upc
+    )
+  }).catch((e) => {
+    console.error(
+      organizationId,
+      inventoryId,
+      upc,
+      e.toString()
+    )
+  })
 }
 
-exports.calculateInventorySummaryFields = functions.firestore
-  .document('/organizations/{organizationId}/inventories/{inventoryId}/counts/{countId}')
+exports.updateInventoryReport = functions.firestore
+  .document('/organizations/{organizationId}/inventories/{inventoryId}/counts/{upc}')
   .onWrite((change, context) => {
     const {
       organizationId,
-      inventoryId
+      inventoryId,
+      upc
     } = context.params
 
     if (!change.after.exists) return
@@ -122,12 +137,13 @@ exports.calculateInventorySummaryFields = functions.firestore
     return updateSummary({
       organizationId,
       inventoryId,
+      upc,
       before,
       after
     })
   })
 
-exports.updateQtyFromScanLog = functions.firestore
+exports.updateQtyAfterScan = functions.firestore
   .document('/organizations/{organizationId}/inventories/{inventoryId}/scans/{scanId}')
   .onWrite((change, context) => {
     const {
@@ -143,26 +159,62 @@ exports.updateQtyFromScanLog = functions.firestore
       try {
         const inventoryCountPath = `/organizations/${organizationId}/inventories/${inventoryId}/counts/${upc}`
         const inventoryCountRef = admin.firestore().doc(inventoryCountPath)
-        console.log('inventoryCountPath', inventoryCountPath)
-        return admin.firestore().runTransaction((transaction) => {
-          console.log('Starting transaction...')
-          return transaction.get(inventoryCountRef).then((inventoryCountDoc) => {
-            if (!inventoryCountDoc.exists) {
-              throw new Error("InventoryCount doc doesn't exist.")
-            }
+        let inventoryCount = {}
+        let previousFifoQty = 0
+        let fifoQty
+        let isNewProduct
+        return admin
+          .firestore()
+          .runTransaction(transaction => transaction
+            .get(inventoryCountRef)
+            .then((inventoryCountDoc) => {
+              isNewProduct = !inventoryCountDoc.exists
 
-            const fifoQty = inventoryCountDoc.data().fifoQty + increment
-            return transaction.update(inventoryCountRef, { fifoQty })
+              if (isNewProduct) {
+                fifoQty = previousFifoQty + increment
+                inventoryCount = {
+                  upc,
+                  mimsQty: 0,
+                  fifoQty,
+                  overUnder: fifoQty
+                }
+                return transaction.set(inventoryCountRef, inventoryCount)
+              }
+
+              const previousInventoryDoc = inventoryCountDoc.data()
+              const { mimsQty } = previousInventoryDoc
+              previousFifoQty = previousInventoryDoc.fifoQty
+              fifoQty = previousFifoQty + increment
+              inventoryCount = {
+                fifoQty,
+                overUnder: fifoQty - mimsQty
+              }
+              return transaction.update(inventoryCountRef, inventoryCount)
+            })).then(() => {
+            console.log(
+              organizationId,
+              inventoryId,
+              upc,
+              `From ${previousFifoQty} to ${fifoQty}`,
+              (isNewProduct) ? 'New Product' : ''
+            )
+            return null
+          }).catch((e) => {
+            console.error(
+              organizationId,
+              inventoryId,
+              upc,
+              e.toString()
+            )
+            return null
           })
-        }).then(() => {
-          console.log('Successfully updated:', organizationId, inventoryId, upc)
-          return null
-        }).catch((e) => {
-          console.warn('Error updating InventoryCount (1):', e.toString(), organizationId, inventoryId, upc)
-          return null
-        })
       } catch (e) {
-        console.warn('Error updating InventoryCount (2):', e.toString(), organizationId, inventoryId, upc)
+        console.error(
+          organizationId,
+          inventoryId,
+          upc,
+          e.toString()
+        )
         return false
       }
     }
@@ -176,6 +228,10 @@ exports.updateQtyFromScanLog = functions.firestore
     }
   })
 
-exports.updateFirestoreWithSummary = functions.database
-  .ref('/organizations/{organizationId}/inventories/{inventoryId}/report')
-  .onUpdate(({ after }) => after.ref.parent.child('lastUpdated').set(admin.database.ServerValue.TIMESTAMP))
+// exports.updateFirestoreWithSummary =  functions.database
+//   .ref('/organizations/{organizationId}/inventories/{inventoryId}/report')
+//   .onUpdate(({ after }) => after
+// .ref
+// .parent
+// .child('lastUpdated')
+// .set(admin.database.ServerValue.TIMESTAMP))

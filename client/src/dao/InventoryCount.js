@@ -52,6 +52,7 @@ class InventoryCount extends TuposFirestoreModel {
       sellInPrice: this.sellInPrice,
       type: this.type,
       upc: this.upc,
+      overUnder: this.overUnder,
     }
   }
 

@@ -342,10 +342,7 @@ class ViewInventory extends Component {
             isOpen={FramesOverDialogOpen}
             onClose={() => { this.setState({ FramesOverDialogOpen: false }) }}
             status="over"
-            fetchData={async () => {
-              const { over } = await api.getInventoryFramesDiff(inventoryId)
-              return over
-            }}
+            fetchData={async () => inventory.getOver()}
             name="FramesOverDialog"
             title={`${inventory.report.counts.over} styles with more frames than MIMs`}
           />
@@ -354,10 +351,7 @@ class ViewInventory extends Component {
             isOpen={FramesUnderDialogOpen}
             onClose={() => { this.setState({ FramesUnderDialogOpen: false }) }}
             status="under"
-            fetchData={async () => {
-              const { under } = await api.getInventoryFramesDiff(inventoryId)
-              return under
-            }}
+            fetchData={async () => inventory.getUnder()}
             name="FramesUnderDialog"
             title={`${inventory.report.counts.under} styles with fewer frames than MIMs`}
           />
