@@ -335,6 +335,7 @@ class ViewInventory extends Component {
             status={inventory.report.diff.styles > 0 ? 'over' : 'under'}
             fetchData={async () => inventory.getStylesDiff()}
             name="StyleDiffDialog"
+            showQty={false}
             title={`${Math.abs(inventory.report.diff.styles)} ${(inventory.report.diff.styles > 0) ? 'more styles than MIMs' : 'less styles than MIMs'}`}
           />
 

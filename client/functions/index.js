@@ -110,6 +110,7 @@ function updateSummary({
       inventoryId,
       upc
     )
+    return true
   }).catch((e) => {
     console.error(
       organizationId,
@@ -117,6 +118,7 @@ function updateSummary({
       upc,
       e.toString()
     )
+    return false
   })
 }
 
@@ -129,7 +131,15 @@ exports.updateInventoryReport = functions.firestore
       upc
     } = context.params
 
-    if (!change.after.exists) return
+    if (!change.after.exists) {
+      console.error(
+        organizationId,
+        inventoryId,
+        upc,
+        'Document was deleted. Skipping calculations.'
+      )
+      return false
+    }
 
     const before = change.before.data()
     const after = change.after.data()
