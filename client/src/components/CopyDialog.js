@@ -5,7 +5,6 @@ import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
 import RoundButton from '../components/RoundButton'
 import copyIcon from '../assets/copy-icon.png'
-import InventoryFrameDiffCollection from '../dao/InventoryFrameDiffCollection'
 
 class FrameDiffDialog extends Component {
   constructor(props) {

@@ -18,18 +18,38 @@
     <div id="root" class="max-height" />
 
     <!-- Firebase App is always required and must be first -->
-    <script src="/__/firebase/5.0.4/firebase-app.js"></script>
+    <script src="/__/firebase/5.0.1/firebase-app.js"></script>
 
     <!-- Add additional services you want to use -->
-    <script src="/__/firebase/5.0.4/firebase-auth.js"></script>
-    <script src="/__/firebase/5.0.4/firebase-firestore.js"></script>
-    <script src="/__/firebase/5.0.4/firebase-database.js"></script>
-    <!-- <script src="/__/firebase/5.0.4/firebase-messaging.js"></script> -->
-    <script src="/__/firebase/5.0.4/firebase-functions.js"></script>
+    <script src="/__/firebase/5.0.1/firebase-auth.js"></script>
+    <script src="/__/firebase/5.0.1/firebase-firestore.js"></script>
+    <script src="/__/firebase/5.0.1/firebase-database.js"></script>
+    <!-- <script src="/__/firebase/5.0.1/firebase-messaging.js"></script> -->
+    <script src="/__/firebase/5.0.1/firebase-functions.js"></script>
 
     <!-- Comment out (or don't include) services you don't want to use -->
-    <!-- <script src="/__/firebase/5.0.4/firebase-storage.js"></script> -->
+    <!-- <script src="/__/firebase/5.0.1/firebase-storage.js"></script> -->
 
-    <script src="/__/firebase/init.js"></script>
+    <script>
+      // Initialize Firebase
+      var firebaseApp;
+      var config = {
+        apiKey: "AIzaSyACJZRIfTh-d-pFZysS5j0aZfjfGwVHMP8",
+        authDomain: "irisoft-inventory.firebaseapp.com",
+        databaseURL: "https://irisoft-inventory.firebaseio.com",
+        projectId: "irisoft-inventory",
+        storageBucket: "irisoft-inventory.appspot.com",
+        messagingSenderId: "72953003686"
+      };
+      firebaseApp = firebase.initializeApp(config);
+    </script>
+
+    <!-- <script src="/__/firebase/init.js"></script> -->
+    <!-- <script type="text/javascript">
+      var firebaseApp;
+      fetch('/__/firebase/init.json').then(response => {
+        firebaseApp = firebase.initializeApp(response.json());
+      });
+    </script> -->
   </body>
 </html>

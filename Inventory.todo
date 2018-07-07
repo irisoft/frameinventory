@@ -48,3 +48,8 @@ TuposeFirestoreModel
 ✔ Popups!! @done(2018-06-21 23:01)
 ✔ Handle Scan of Invalid barcode by adding new product @done(2018-06-21 23:01)
 ✔ Standardize logging of cloud functions for easy troubleshooting + readability + terseness (one line per invocation?) @done(2018-06-21 22:17)
+
+B E T A - R E A D Y
+☐ Move to FB Auth
+☐ Database Security Rules
+☐ Attach User to Org on Login

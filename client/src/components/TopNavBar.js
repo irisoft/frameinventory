@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 // import { Navbar, NavbarBrand, Nav, NavItem, NavLink, NavbarToggler, Collapse } from 'reactstrap'
-import { withAuth } from '@okta/okta-react'
+// import { withAuth } from '@okta/okta-react'
 // import { Link } from 'react-router-dom'
 import logo from '../assets/fifo-logo-white.svg'
 import RoundButton from './RoundButton'
@@ -11,20 +11,20 @@ class TopNavBar extends Component {
     super(props)
     this.toggleNavbar = this.toggleNavbar.bind(this)
     this.state = { authenticated: false, isOpen: false }
-    this.checkAuthentication = this.checkAuthentication.bind(this)
-    this.checkAuthentication()
+    // this.checkAuthentication = this.checkAuthentication.bind(this)
+    // this.checkAuthentication()
   }
 
-  componentDidUpdate() {
-    this.checkAuthentication()
-  }
+  // componentDidUpdate() {
+  //   this.checkAuthentication()
+  // }
 
-  async checkAuthentication() {
-    const authenticated = await this.props.auth.isAuthenticated()
-    if (authenticated !== this.state.authenticated) {
-      this.setState({ authenticated })
-    }
-  }
+  // async checkAuthentication() {
+  //   const authenticated = await this.props.auth.isAuthenticated()
+  //   if (authenticated !== this.state.authenticated) {
+  //     this.setState({ authenticated })
+  //   }
+  // }
 
   toggleNavbar() {
     this.setState({
@@ -52,7 +52,7 @@ class TopNavBar extends Component {
                 About
               </Link>
               <Link
-                className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" 
+                className="f6 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3"
                 to="/sign-up"
               >
                 Register
@@ -64,10 +64,10 @@ class TopNavBar extends Component {
                 Inventory
               </Link>
             */}
-            { this.state.authenticated
+            {/* { this.state.authenticated
               ? <RoundButton mini color="isgreen" textColor="white" onClick={this.props.auth.logout} label="Logout" />
               : <RoundButton mini color="isgreen" textColor="white" onClick={this.props.auth.login} label="Login" />
-            }
+            } */}
           </div>
         </nav>
       </header>
@@ -112,4 +112,4 @@ TopNavBar.defaultProps = {
   auth: null,
 }
 
-export default withAuth(TopNavBar)
+export default TopNavBar
