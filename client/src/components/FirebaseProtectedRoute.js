@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Route } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
+
 
 class FirebaseProtectedRoute extends Component {
   constructor(props) {
@@ -34,7 +35,7 @@ class FirebaseProtectedRoute extends Component {
         {...rest}
         render={(props) => {
           if (isSignedIn === true) return (<RouteComponent {...props} />)
-          else if (isSignedIn === false) return (<div className="mt6">Not Signed In</div>)
+          else if (isSignedIn === false) return (<Redirect to="/sign-in" />)
           return null
         }}
       />
