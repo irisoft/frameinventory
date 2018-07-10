@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import Container from '../../components/Container'
 import PageHeading from '../../components/PageHeading'
 import PageFooter from '../../components/PageFooter'
@@ -23,17 +22,6 @@ class ListInventories extends Component {
     })
   }
 
-  componentDidUpdate() {
-    this.checkAuthentication()
-  }
-
-  async checkAuthentication() {
-    const authenticated = await this.props.auth.isAuthenticated()
-    if (authenticated !== this.state.authenticated) {
-      this.setState({ authenticated })
-    }
-  }
-
   render() {
     const { inventories } = this.state
     const inventoriesItems = Array.isArray(inventories) && inventories.map(inventory => (
@@ -45,8 +33,6 @@ class ListInventories extends Component {
         overCount={inventory.report.counts.over}
       />
     ))
-
-    if (this.state.authenticated === null) return null
 
     return (
       <Container>
@@ -73,18 +59,6 @@ class ListInventories extends Component {
       </Container>
     )
   }
-}
-
-ListInventories.propTypes = {
-  auth: PropTypes.shape({
-    logout: PropTypes.func,
-    login: PropTypes.func,
-    isAuthenticated: PropTypes.func,
-  }),
-}
-
-ListInventories.defaultProps = {
-  auth: null,
 }
 
 export default ListInventories

@@ -204,7 +204,6 @@ class ViewInventory extends Component {
           inventoryId,
         },
       },
-      api,
     } = this.props
 
     let pageContents
@@ -385,14 +384,10 @@ ViewInventory.propTypes = {
       inventoryId: PropTypes.string,
     }),
   }),
-  api: PropTypes.shape({
-
-  }),
 }
 
 ViewInventory.defaultProps = {
   match: null,
-  api: null,
 }
 
 export default ViewInventory

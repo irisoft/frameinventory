@@ -5,14 +5,14 @@ import NoAuthContainer from './views/NoAuthContainer'
 import AuthContainer from './views/auth/AuthContainer'
 import TopNavBar from './components/TopNavBar'
 
-function App() {
+function App({ firebaseApp }) {
   return (
     <Router>
       <div>
-        <TopNavBar />
-        <NoAuthContainer />
+        <TopNavBar firebaseApp={firebaseApp} />
+        <NoAuthContainer firebaseApp={firebaseApp} />
         <div className="max-height">
-          <FirebaseProtectedRoute path="/auth" component={AuthContainer} />
+          <FirebaseProtectedRoute path="/auth" component={AuthContainer} firebaseApp={firebaseApp} />
         </div>
       </div>
     </Router>

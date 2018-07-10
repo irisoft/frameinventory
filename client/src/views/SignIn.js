@@ -1,12 +1,13 @@
-/* global firebase, firebaseApp */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Redirect } from 'react-router-dom'
+import firebase from 'firebase/app'
+import 'firebase/auth'
 import firebaseui from 'firebaseui'
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
 
 // Configure FirebaseUI.
-let uiConfig = {
+const uiConfig = {
   // Popup signin flow rather than redirect flow.
   signInFlow: 'popup',
   // Redirect to /signedIn after sign in is successful. Alternatively you can provide
@@ -15,7 +16,6 @@ let uiConfig = {
   // We will display Google and Facebook as auth providers.
   signInOptions: [
     firebase.auth.EmailAuthProvider.PROVIDER_ID,
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
   ],
   credentialHelper: firebaseui.auth.CredentialHelper.NONE,
   callbacks: {
@@ -24,20 +24,6 @@ let uiConfig = {
       console.log(redirectUrl)
       return true
     },
-    signInSuccess: () => {
-      console.log('woot!')
-    },
-  },
-}
-
-uiConfig = {
-  signInFlow: 'popup',
-  signInOptions: [
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    firebase.auth.EmailAuthProvider.PROVIDER_ID,
-  ],
-  callbacks: {
-    signInSuccessWithAuthResult: () => false,
   },
 }
 
@@ -51,7 +37,7 @@ class LoginForm extends Component {
 
   componentDidMount() {
     try {
-      this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
+      this.unregisterAuthObserver = this.props.firebaseApp.auth().onAuthStateChanged((user) => {
         this.setState({ isSignedIn: !!user })
       })
     } catch (error) {
@@ -60,18 +46,19 @@ class LoginForm extends Component {
   }
 
   componentWillUnmount() {
-    this.unregisterAuthObserver()
+    if (typeof this.unregisterAuthObserver === 'function') this.unregisterAuthObserver()
   }
 
   render() {
     const { isSignedIn } = this.state
-    return isSignedIn
-      ? (<Redirect to="/auth/" />)
-      : (
-        <div className="w-100 mt5 tc">
-          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />
-        </div>
-      )
+    return (
+      <div>
+        { isSignedIn && <Redirect to="/auth/" /> }
+        { isSignedIn === false && <div className="w-100 mt5 tc">
+          <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={this.props.firebaseApp.auth()} />
+        </div>}
+      </div>
+    )
   }
 }
 

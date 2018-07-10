@@ -1,19 +1,16 @@
-/* global firebase */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+import 'firebase/database'
 
-const firestore = firebase.firestore()
-const database = firebase.database()
-
-const firestoreSettings = {
-  timestampsInSnapshots: true,
-}
-firestore.settings(firestoreSettings)
+// const firestore = firebase.firestore()
+// const database = firebase.database()
 
 class TuposFirestoreModel {
   static async load(docPath) {
     try {
-      const doc = await firestore.doc(docPath).get()
+      const doc = await firebase.firestore().doc(docPath).get()
       if (doc.exists) {
         return doc.data()
       }
@@ -26,7 +23,7 @@ class TuposFirestoreModel {
 
   static async loadCollection(collectionPath, wheres = [], watchFunction = null) {
     try {
-      let collectionQuery = firestore.collection(collectionPath)
+      let collectionQuery = firebase.firestore().collection(collectionPath)
 
       if (Array.isArray(wheres)) {
         wheres.forEach(([fieldPath, opStr, value]) => {
@@ -50,7 +47,7 @@ class TuposFirestoreModel {
   static saveBatch(items) {
     const batchLimit = 450
     const promises = []
-    const batches = [firestore.batch()]
+    const batches = [firebase.firestore().batch()]
     let batchIndex = 0
     let batchCount = 0
 
@@ -60,7 +57,7 @@ class TuposFirestoreModel {
       if (batchCount > 0) {
         promises.push(currentBatch().commit())
         batchCount = 0
-        batches.push(firestore.batch())
+        batches.push(firebase.firestore().batch())
         batchIndex += 1
       }
     }
@@ -85,7 +82,7 @@ class TuposFirestoreModel {
     if (!path || typeof path !== 'string') {
       throw new Error('Path required for getDatabaseRef')
     }
-    return database.ref(path)
+    return firebase.database().ref(path)
   }
 
   static registerDatabaseWatcher(path, watchFunction, isRealtime = false) {
@@ -117,7 +114,7 @@ class TuposFirestoreModel {
   }
 
   firestoreRef() {
-    return firestore.doc(`${this.collectionPath()}/${this.id}`)
+    return firebase.firestore().doc(`${this.collectionPath()}/${this.id}`)
   }
 
   save(batch = null) {
@@ -128,7 +125,7 @@ class TuposFirestoreModel {
         }
         return this.firestoreRef().set(this.getDataObject())
       }
-      return firestore.collection(this.collectionPath()).add(this.getDataObject())
+      return firebase.firestore().collection(this.collectionPath()).add(this.getDataObject())
     } catch (e) {
       console.error(e)
     }

@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
 import Dropzone from 'react-dropzone'
 import Spinner from 'react-spinkit'
@@ -11,6 +10,7 @@ import RoundButton from '../../components/RoundButton'
 import UploadIcon from '../../assets/upload-icon.png'
 import FolderIcon from '../../assets/folder-open-dark.png'
 import InventoryCount from '../../dao/InventoryCount'
+import Inventory from '../../dao/Inventory'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -35,30 +35,35 @@ class UploadReport extends Component {
   processFile = () => {
     this.setState({ processingFile: true }, () => {
       const { file } = this.state
-      const { api } = this.props
       const reader = new FileReader()
 
-      reader.onload = (loadEvent) => {
+      reader.onload = async (loadEvent) => {
         const data = loadEvent.target.result
 
         const workbook = XLSX.read(data, { type: 'binary' })
 
         const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
 
-        api.createNewInventory().then(async ({ id: inventoryId }) => {
-          const products = json.map(row => new InventoryCount({
-            upc: row['EAN/UPC'],
-            description: row['Material Description'],
-            brand: row['Product Brand'],
-            type: row['Product Type'],
-            salesPrice: row['Sales Price'],
-            sellInPrice: row['Sell-in Price'],
-            mimsQty: row.Quantity,
-            fifoQty: 0,
-          }, 'po6IONOcohOE9a8U06yH', inventoryId))
-          await InventoryCount.saveBatch(products)
-          this.setState({ readyToRedirect: true, inventoryId })
-        })
+        const inventory = new Inventory({
+          status: 'active',
+          locationId: 'organizations/po6IONOcohOE9a8U06yH/locations/Oea2rlsW1hnN3vUmOObU',
+          startedAt: new Date(),
+        }, 'po6IONOcohOE9a8U06yH')
+
+        const inventoryRef = await inventory.save()
+        console.log('inventoryRef', inventoryRef)
+        const products = json.map(row => new InventoryCount({
+          upc: row['EAN/UPC'],
+          description: row['Material Description'],
+          brand: row['Product Brand'],
+          type: row['Product Type'],
+          salesPrice: row['Sales Price'],
+          sellInPrice: row['Sell-in Price'],
+          mimsQty: row.Quantity,
+          fifoQty: 0,
+        }, 'po6IONOcohOE9a8U06yH', inventoryRef.id))
+        await InventoryCount.saveBatch(products)
+        this.setState({ readyToRedirect: true, inventoryId: inventoryRef.id })
       }
 
       reader.readAsBinaryString(file)
@@ -164,14 +169,6 @@ class UploadReport extends Component {
       </Container>
     )
   }
-}
-
-UploadReport.propTypes = {
-  api: PropTypes.shape({}),
-}
-
-UploadReport.defaultProps = {
-  api: null,
 }
 
 export default UploadReport

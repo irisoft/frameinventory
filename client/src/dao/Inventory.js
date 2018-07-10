@@ -10,7 +10,6 @@ class Inventory extends TuposFirestoreModel {
     this.locationId = json.locationId
     this.startedAt = json.startedAt
     this.status = json.status
-
     this.organizationId = organizationId
     this.inventoryId = inventoryId
   }
@@ -44,7 +43,7 @@ class Inventory extends TuposFirestoreModel {
   getDataObject() {
     return {
       locationId: this.locationId,
-      report: this.report.getDataObject(),
+      report: this.report ? this.report.getDataObject() : null,
       startedAt: this.startedAt,
       status: this.status,
     }

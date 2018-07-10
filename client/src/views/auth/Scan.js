@@ -1,9 +1,9 @@
-/* global firebase */
 /* eslint-disable react/no-multi-comp */
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Moment from 'moment'
+import firebase from 'firebase/app'
 import Scanner from '../../components/Scanner'
 import PageHeading from '../../components/PageHeading'
 import Container from '../../components/Container'

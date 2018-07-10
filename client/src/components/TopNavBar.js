@@ -4,13 +4,13 @@ import PropTypes from 'prop-types'
 // import { withAuth } from '@okta/okta-react'
 // import { Link } from 'react-router-dom'
 import logo from '../assets/fifo-logo-white.svg'
-import RoundButton from './RoundButton'
+// import RoundButton from './RoundButton'
 
 class TopNavBar extends Component {
   constructor(props) {
     super(props)
     this.toggleNavbar = this.toggleNavbar.bind(this)
-    this.state = { authenticated: false, isOpen: false }
+    this.state = { isOpen: false }
     // this.checkAuthentication = this.checkAuthentication.bind(this)
     // this.checkAuthentication()
   }

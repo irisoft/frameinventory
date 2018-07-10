@@ -1,7 +1,6 @@
-/* global firebase */
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Route, Redirect } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 
 class FirebaseProtectedRoute extends Component {
   constructor(props) {
@@ -12,8 +11,9 @@ class FirebaseProtectedRoute extends Component {
   }
 
   componentDidMount() {
+    const { firebaseApp } = this.props
     try {
-      this.unregisterAuthObserver = firebase.app().auth().onAuthStateChanged((user) => {
+      this.unregisterAuthObserver = firebaseApp.auth().onAuthStateChanged((user) => {
         this.setState({ isSignedIn: !!user })
       })
     } catch (error) {
@@ -22,7 +22,7 @@ class FirebaseProtectedRoute extends Component {
   }
 
   componentWillUnmount() {
-    this.unregisterAuthObserver()
+    if (typeof this.unregisterAuthObserver === 'function') this.unregisterAuthObserver()
   }
 
   render() {
@@ -32,18 +32,21 @@ class FirebaseProtectedRoute extends Component {
     return (
       <Route
         {...rest}
-        render={props => (
-          isSignedIn === true
-            ? <RouteComponent {...props} />
-            : <Redirect to="/sign-in" />
-        )}
+        render={(props) => {
+          if (isSignedIn === true) return (<RouteComponent {...props} />)
+          else if (isSignedIn === false) return (<div className="mt6">Not Signed In</div>)
+          return null
+        }}
       />
     )
   }
 }
 
 FirebaseProtectedRoute.propTypes = {
-  component: PropTypes.node.isRequired,
+  component: PropTypes.oneOfType([
+    PropTypes.element,
+    PropTypes.func,
+  ]).isRequired,
 }
 
 FirebaseProtectedRoute.defaultProps = {
