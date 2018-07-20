@@ -12,6 +12,7 @@ import OverArrow from '../../components/OverArrow'
 import UnderArrow from '../../components/UnderArrow'
 import EqualIcon from '../../components/EqualIcon'
 import CopyDialog from '../../components/CopyDialog'
+import withFirebase from '../../hocs/withFirebase'
 
 function isArrayValid(a) {
   return Array.isArray(a) && a.length > 0
@@ -118,6 +119,8 @@ class ViewInventory extends Component {
   }
 
   componentDidUpdate(prevProps) {
+    /* eslint-disable react/no-did-update-set-state */
+
     const { match: { params: { inventoryId: previousInventoryId } } } = prevProps
     const { match: { params: { inventoryId } } } = this.props
     if (inventoryId && (inventoryId !== previousInventoryId)) {
@@ -138,8 +141,8 @@ class ViewInventory extends Component {
   }
 
   async fetchData() {
-    const { match: { params: { inventoryId } } } = this.props
-    const inventory = await Inventory.load('po6IONOcohOE9a8U06yH', inventoryId)
+    const { match: { params: { inventoryId } }, userProfile } = this.props
+    const inventory = await Inventory.load(userProfile.organizationId, inventoryId)
     this.setState({
       inventory,
       inventoryItems: await inventory.getItems(),
@@ -390,4 +393,4 @@ ViewInventory.defaultProps = {
   match: null,
 }
 
-export default ViewInventory
+export default withFirebase(ViewInventory)

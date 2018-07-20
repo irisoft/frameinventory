@@ -11,6 +11,7 @@ import UploadIcon from '../../assets/upload-icon.png'
 import FolderIcon from '../../assets/folder-open-dark.png'
 import InventoryCount from '../../dao/InventoryCount'
 import Inventory from '../../dao/Inventory'
+import withFirebase from '../../hocs/withFirebase'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -35,6 +36,7 @@ class UploadReport extends Component {
   processFile = () => {
     this.setState({ processingFile: true }, () => {
       const { file } = this.state
+      const { userProfile } = this.props
       const reader = new FileReader()
 
       reader.onload = async (loadEvent) => {
@@ -46,12 +48,12 @@ class UploadReport extends Component {
 
         const inventory = new Inventory({
           status: 'active',
-          locationId: 'organizations/po6IONOcohOE9a8U06yH/locations/Oea2rlsW1hnN3vUmOObU',
+          locationId: `organizations/${userProfile.organizationId}/locations/Oea2rlsW1hnN3vUmOObU`,
           startedAt: new Date(),
-        }, 'po6IONOcohOE9a8U06yH')
+        }, userProfile.organizationId)
 
         const inventoryRef = await inventory.save()
-        console.log('inventoryRef', inventoryRef)
+
         const products = json.map(row => new InventoryCount({
           upc: row['EAN/UPC'],
           description: row['Material Description'],
@@ -61,7 +63,7 @@ class UploadReport extends Component {
           sellInPrice: row['Sell-in Price'],
           mimsQty: row.Quantity,
           fifoQty: 0,
-        }, 'po6IONOcohOE9a8U06yH', inventoryRef.id))
+        }, userProfile.organizationId, inventoryRef.id))
         await InventoryCount.saveBatch(products)
         this.setState({ readyToRedirect: true, inventoryId: inventoryRef.id })
       }
@@ -171,4 +173,4 @@ class UploadReport extends Component {
   }
 }
 
-export default UploadReport
+export default withFirebase(UploadReport)

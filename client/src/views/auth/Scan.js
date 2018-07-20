@@ -11,6 +11,7 @@ import RoundButton from '../../components/RoundButton'
 import BeepFail from '../../assets/beep-fail.mp3'
 import BeepSuccess from '../../assets/beep-success.mp3'
 import ScanLog from '../../dao/ScanLog'
+import withFirebase from '../../hocs/withFirebase'
 
 const getFirestoreTimestamp = firebase.firestore.Timestamp.now
 
@@ -48,17 +49,21 @@ class Scan extends Component {
   }
 
   async componentDidMount() {
+    /* eslint-disable react/no-did-mount-set-state */
+
     const {
       match: {
         params: {
           inventoryId,
         },
       },
+      userProfile,
     } = this.props
 
-    const stopWatching = await ScanLog.loadCollection('po6IONOcohOE9a8U06yH', inventoryId, [], (scanLog) => {
-      this.setState({ scanLog })
-    })
+    const stopWatching = await ScanLog
+      .loadCollection(userProfile.organizationId, inventoryId, [], (scanLog) => {
+        this.setState({ scanLog })
+      })
 
     this.setState({ stopWatching })
   }
@@ -75,12 +80,13 @@ class Scan extends Component {
           inventoryId,
         },
       },
+      userProfile,
     } = this.props
 
     const scanLog = new ScanLog({
       upc,
       scannedAt: getFirestoreTimestamp(),
-    }, 'po6IONOcohOE9a8U06yH', inventoryId)
+    }, userProfile.organizationId, inventoryId)
 
     await scanLog.save()
     this.beepSuccess.play()
@@ -152,4 +158,4 @@ Scan.defaultProps = {
   match: {},
 }
 
-export default Scan
+export default withFirebase(Scan)

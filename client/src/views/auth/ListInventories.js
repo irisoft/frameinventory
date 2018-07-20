@@ -6,6 +6,7 @@ import InventoryListItem from '../../components/InventoryListItem'
 import RoundButton from '../../components/RoundButton'
 import Inventory from '../../dao/Inventory'
 import UploadIcon from '../../assets/upload-icon.png'
+import withFirebase from '../../hocs/withFirebase'
 
 class ListInventories extends Component {
   constructor(props) {
@@ -17,8 +18,10 @@ class ListInventories extends Component {
   }
 
   async componentDidMount() {
+    /* eslint-disable react/no-did-mount-set-state */
+    const { userProfile } = this.props
     this.setState({
-      inventories: await Inventory.loadCollection('po6IONOcohOE9a8U06yH'),
+      inventories: await Inventory.loadCollection(userProfile.organizationId),
     })
   }
 
@@ -61,4 +64,4 @@ class ListInventories extends Component {
   }
 }
 
-export default ListInventories
+export default withFirebase(ListInventories)

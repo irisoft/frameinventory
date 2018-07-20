@@ -28,23 +28,13 @@ function InventoryListItem({
           </div>
         </div>
       </li>
-
-      {/* <ListGroupItem className="justify-content-between">
-        <button className="btn btn-sm btn-success">View</button>
-        {title}
-        <div>
-          <Badge pill color={overColor}>Over: {overCount}</Badge>
-          &nbsp;
-          <Badge pill color={underColor}>Under: {underCount}</Badge>
-        </div>
-      </ListGroupItem> */}
     </Link>
   )
 }
 
 InventoryListItem.propTypes = {
   id: PropTypes.string,
-  timestamp: PropTypes.string,
+  timestamp: PropTypes.number,
   overCount: PropTypes.number,
   underCount: PropTypes.number,
 }

@@ -43,7 +43,6 @@ class ScanLog extends TuposFirestoreModel {
           const data = change.doc.data()
           const { id } = change.doc
 
-          console.log('new id', id)
           if (change.type === 'added') {
             docs.push(new ScanLog(
               data,

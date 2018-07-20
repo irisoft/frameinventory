@@ -3,7 +3,7 @@ import React from 'react'
 // import { Row, Col } from 'reactstrap'
 import Container from '../components/Container'
 
-function About(props) {
+function About() {
   return (
     <Container>
       <h1 className="f3">About</h1>

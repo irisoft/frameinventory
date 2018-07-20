@@ -16,11 +16,11 @@ class Scanner extends Component {
     this.setState({ value: event.target.value })
   }
 
-  handleBlur = (event) => {
+  handleBlur = () => {
     this.setState({ focused: false })
   }
 
-  handleFocus = (event) => {
+  handleFocus = () => {
     this.setState({ focused: true })
   }
 
@@ -66,14 +66,17 @@ class Scanner extends Component {
           }}
           ref={(input) => { this.input = input }}
         />
-        { !focused && <button
-          className="btn btn-success"
-          style={{
-            margin: 'auto', marginTop: -49, marginBottom: 10, zIndex: 10,
-}}
-          onClick={() => { this.input.focus() }}
-        >Start Scanning
-                      </button>}
+        {!focused && (
+          <button
+            className="btn btn-success"
+            style={{
+              margin: 'auto', marginTop: -49, marginBottom: 10, zIndex: 10,
+            }}
+            onClick={() => { this.input.focus() }}
+          >
+            Start Scanning
+          </button>
+        )}
       </div>
     )
   }
