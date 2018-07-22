@@ -61,9 +61,15 @@ class Scan extends Component {
     } = this.props
 
     const stopWatching = await ScanLog
-      .loadCollection(userProfile.organizationId, inventoryId, [], (scanLog) => {
-        this.setState({ scanLog })
-      })
+      .loadCollection(
+        userProfile.organizationId,
+        inventoryId,
+        [],
+        { fieldPath: 'scannedAt', directionStr: 'desc' },
+        (scanLog) => {
+          this.setState({ scanLog })
+        },
+      )
 
     this.setState({ stopWatching })
   }

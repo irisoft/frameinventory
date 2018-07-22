@@ -21,7 +21,7 @@ class TuposFirestoreModel {
     return null
   }
 
-  static async loadCollection(collectionPath, wheres = [], watchFunction = null) {
+  static async loadCollection(collectionPath, wheres = [], orderBy = null, watchFunction = null) {
     try {
       let collectionQuery = firebase.firestore().collection(collectionPath)
 
@@ -29,6 +29,11 @@ class TuposFirestoreModel {
         wheres.forEach(([fieldPath, opStr, value]) => {
           collectionQuery = collectionQuery.where(fieldPath, opStr, value)
         })
+      }
+
+      if (orderBy !== null && typeof orderBy === 'object' && 'fieldPath' in orderBy) {
+        const { fieldPath, directionStr = 'asc' } = orderBy
+        collectionQuery = collectionQuery.orderBy(fieldPath, directionStr)
       }
 
       if (typeof watchFunction === 'function') {

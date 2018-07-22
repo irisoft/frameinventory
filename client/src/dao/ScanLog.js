@@ -23,7 +23,13 @@ class ScanLog extends TuposFirestoreModel {
     return new ScanLog(data, organizationId, inventoryId, scanId)
   }
 
-  static async loadCollection(organizationId, inventoryId, wheres = [], watchFunction = null) {
+  static async loadCollection(
+    organizationId,
+    inventoryId,
+    wheres = [],
+    orderBy = null,
+    watchFunction = null,
+  ) {
     if (!organizationId || organizationId === '') throw new Error('Argument `organizationId` is required for ScanLog.loadCollection')
     if (!inventoryId || inventoryId === '') throw new Error('Argument `inventoryId` is required for ScanLog.loadCollection')
 
@@ -44,13 +50,19 @@ class ScanLog extends TuposFirestoreModel {
           const { id } = change.doc
 
           if (change.type === 'added') {
-            docs.push(new ScanLog(
+            const newScan = new ScanLog(
               data,
               organizationId,
               inventoryId,
               id,
-            ))
+            )
+            if (orderBy !== null && typeof orderBy === 'object' && orderBy.directionStr === 'desc') {
+              docs.unshift(newScan)
+            } else {
+              docs.push(newScan)
+            }
           }
+
           if (change.type === 'modified') {
             docs[getKey(id)] = new ScanLog(
               data,
@@ -59,15 +71,34 @@ class ScanLog extends TuposFirestoreModel {
               id,
             )
           }
+
           if (change.type === 'removed') {
             docs.splice(getKey(id), 1)
           }
+
+          if (orderBy !== null && typeof orderBy === 'object' && 'fieldPath' in orderBy) {
+            const direction = (orderBy.directionStr === 'desc') ? -1 : 1
+            docs.sort((a, b) => {
+              if (a[orderBy.fieldPath] > b[orderBy.fieldPath]) {
+                return 1 * direction
+              } else if (a[orderBy.fieldPath] < b[orderBy.fieldPath]) {
+                return -1 * direction
+              }
+              return 0
+            })
+          }
+
           watchFunction(docs)
         })
       }
     }
 
-    const data = await TuposFirestoreModel.loadCollection(`/organizations/${organizationId}/inventories/${inventoryId}/scans`, wheres, internalWatcher)
+    const data = await TuposFirestoreModel.loadCollection(
+      `/organizations/${organizationId}/inventories/${inventoryId}/scans`,
+      wheres,
+      orderBy,
+      internalWatcher,
+    )
 
     if (Array.isArray(data)) {
       return data.map(scanLogSnapshot => new ScanLog(
