@@ -54,7 +54,12 @@ class UploadReport extends Component {
 
         const inventoryRef = await inventory.save()
 
-        const products = json.map(row => new InventoryCount({
+        const products = json.filter((row) => {
+          const productType = ('Product Type' in row) && typeof row['Product Type'] === 'string'
+            ? row['Product Type'].toLowerCase()
+            : ''
+          return productType === 'frames'
+        }).map(row => new InventoryCount({
           upc: row['EAN/UPC'],
           description: row['Material Description'],
           brand: row['Product Brand'],
