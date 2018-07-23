@@ -21,7 +21,7 @@ class ListInventories extends Component {
     /* eslint-disable react/no-did-mount-set-state */
     const { userProfile } = this.props
     this.setState({
-      inventories: await Inventory.loadCollection(userProfile.organizationId),
+      inventories: await Inventory.loadCollection(userProfile.organizationId, [], { fieldPath: 'startedAt', directionStr: 'desc' }),
     })
   }
 
@@ -34,6 +34,7 @@ class ListInventories extends Component {
         timestamp={inventory.startedAt.getTime()}
         underCount={inventory.report.counts.under}
         overCount={inventory.report.counts.over}
+        name={inventory.name}
       />
     ))
 
