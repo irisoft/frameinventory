@@ -7,6 +7,7 @@ import setString from './base/setters/string'
 class Inventory extends TuposFirestoreModel {
   constructor(json, organizationId = null, inventoryId = null) {
     super(json)
+    this.name = json.name
     this.locationId = json.locationId
     this.startedAt = json.startedAt
     this.status = json.status
@@ -23,9 +24,9 @@ class Inventory extends TuposFirestoreModel {
     return inventory
   }
 
-  static async loadCollection(organizationId, wheres = []) {
+  static async loadCollection(organizationId, wheres = [], orderBy = null) {
     if (!organizationId || organizationId === '') throw new Error('Argument `organizationId` is required for Inventory.loadCollection')
-    const data = await TuposFirestoreModel.loadCollection(`/organizations/${organizationId}/inventories`, wheres)
+    const data = await TuposFirestoreModel.loadCollection(`/organizations/${organizationId}/inventories`, wheres, orderBy)
     if (Array.isArray(data)) {
       return Promise.all(data.map(async (inventorySnapshot) => {
         const inventory = new Inventory(
@@ -42,8 +43,9 @@ class Inventory extends TuposFirestoreModel {
 
   getDataObject() {
     return {
+      name: this.name,
       locationId: this.locationId,
-      report: this.report ? this.report.getDataObject() : null,
+      report: this.report ? (typeof this.report.getDataObject === 'function') && this.report.getDataObject() : null,
       startedAt: this.startedAt,
       status: this.status,
     }
@@ -132,6 +134,14 @@ class Inventory extends TuposFirestoreModel {
 
   set inventoryId(inventoryId) {
     this._inventoryId = setString(inventoryId, 'inventoryId')
+  }
+
+  get name() {
+    return this._name
+  }
+
+  set name(name) {
+    this._name = setString(name, 'name')
   }
 
   get locationId() {

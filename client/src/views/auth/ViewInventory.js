@@ -12,6 +12,7 @@ import OverArrow from '../../components/OverArrow'
 import UnderArrow from '../../components/UnderArrow'
 import EqualIcon from '../../components/EqualIcon'
 import CopyDialog from '../../components/CopyDialog'
+import EditableLabel from '../../components/EditableLabel'
 import withFirebase from '../../hocs/withFirebase'
 
 function isArrayValid(a) {
@@ -371,7 +372,7 @@ class ViewInventory extends Component {
               to="/auth/list"
             />
           </div>
-          <h1 className="f2 normal mr3 mv0">Inventory Report</h1>
+          <h1 className="f2 normal mr3 mv0"><EditableLabel model={inventory} prop="name" defaultLabel="Inventory Report" /> </h1>
           <h2 className="f5 normal flex-auto mb0 mt2">{readyToRoll ? new Moment(inventory.startedAt).format('dddd, MMMM Do') : ''}</h2>
           <RoundButton to={`/auth/scan/${inventoryId}`} color="isgreen" textColor="white" label="Scan" icon={UploadIcon} />
         </div>
