@@ -50,6 +50,10 @@ body {
   background-color: #FBFBFB !important;
 }
 
+.react-grid-Canvas {
+  background-color: #f4f4f4 !important;
+}
+
 .react-grid-Cell {
   padding-left: 15px !important;
   padding-right: 15px !important;

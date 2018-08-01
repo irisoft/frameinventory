@@ -8,12 +8,20 @@ import 'firebase/database'
 // const database = firebase.database()
 
 class TuposFirestoreModel {
-  static async load(docPath) {
+  static async load(docPath, watchFunction = null) {
     try {
       const doc = await firebase.firestore().doc(docPath).get()
+
+      if (typeof watchFunction === 'function') {
+        return firebase.firestore().doc(docPath).onSnapshot((docSnapshot) => {
+          watchFunction(docSnapshot.data() || {})
+        })
+      }
+
       if (doc.exists) {
         return doc.data()
       }
+
       console.error('Could not locate doc:', docPath)
     } catch (error) {
       console.error('Unable to load:', docPath, error)

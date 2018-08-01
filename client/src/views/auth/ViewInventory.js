@@ -95,7 +95,7 @@ class ViewInventory extends Component {
     this.columns = () => {
       const columns = [
         {
-          key: 'upc', name: 'UPC', width: 160, sortable: true,
+          key: 'upc', name: 'UPC', width: 180, sortable: true,
         }, {
           key: 'brand', name: 'Brand', width: 180, sortable: true,
         }, {
@@ -368,7 +368,7 @@ class ViewInventory extends Component {
         <div className="flex items-center mb4">
           <div className="mr3 mv0">
             <RoundButton
-              label="< Reports"
+              label={<nobr>&larr; Reports</nobr>}
               to="/auth/list"
             />
           </div>

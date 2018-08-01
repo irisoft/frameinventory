@@ -6,6 +6,7 @@ import setGTIN14 from './base/setters/barcodes/gtin-14'
 class InventoryCount extends TuposFirestoreModel {
   constructor(json, organizationId = null, inventoryId = null) {
     super()
+
     this.brand = json.brand
     this.description = json.description
     this.mimsQty = json.mimsQty
@@ -19,12 +20,22 @@ class InventoryCount extends TuposFirestoreModel {
     this.inventoryId = inventoryId
   }
 
-  static async load(organizationId, inventoryId, upc) {
+  static async load(organizationId, inventoryId, upc, watchFunction = null) {
     if (!organizationId || organizationId === '') throw new Error('Argument `organizationId` is required for InventoryCount')
     if (!inventoryId || inventoryId === '') throw new Error('Argument `inventoryId` is required for InventoryCount')
     if (!upc || upc === '') throw new Error('Argument `upc` is required for InventoryCount')
-    const data = await TuposFirestoreModel.load(`/organizations/${organizationId}/inventories/${inventoryId}/counts/${upc}`)
+
+    let internalWatcher
+    if (typeof watchFunction === 'function') {
+      internalWatcher = (json) => {
+        if (json === null) return null
+        watchFunction(new InventoryCount(json, organizationId, inventoryId))
+      }
+    }
+
+    const data = await TuposFirestoreModel.load(`/organizations/${organizationId}/inventories/${inventoryId}/counts/${upc}`, internalWatcher)
     if (data === null) return null
+    if (typeof data === 'function') return data
     return new InventoryCount(data, organizationId, inventoryId)
   }
 

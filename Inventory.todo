@@ -2,8 +2,8 @@ Trying to get everything ready to sell at Pearle trade show on April 28th
 
 ✔ Implement Andy's design (using tachyons instead of bootstrap -- optional) @done(2018-04-24 22:52)
 ☐ Make SCAN work on View Inventory screen
-☐ Change database structure to support mutliple Okta users per ORGANIZATION
-☐ Change login to look up Organization when logging in
+✔ Change database structure to support mutliple Okta users per ORGANIZATION @done(2018-07-19 23:46)
+✔ Change login to look up Organization when logging in @done(2018-07-19 23:46)
 ☐ Change sign up form to support Org+Users model
 ✔ Upgrade Heroku account to minimal production level @done(2018-06-18 22:38)
 ☐ Integrate with Stripe API to support subscription / sign up
@@ -50,6 +50,25 @@ TuposeFirestoreModel
 ✔ Standardize logging of cloud functions for easy troubleshooting + readability + terseness (one line per invocation?) @done(2018-06-21 22:17)
 
 B E T A - R E A D Y
-☐ Move to FB Auth
-☐ Database Security Rules
-☐ Attach User to Org on Login
+✔ Move to FB Auth @done(2018-07-19 23:46)
+✔ Database Security Rules @done(2018-07-19 23:46)
+✔ Attach User to Org on Login @done(2018-07-19 23:46)
+
+☐ Locations still hardcoded (need to decide how to implement)
+☐ Need a org/user management interface (maybe, admins only)
+☐ Scan Log is locking up for some reason
+
+
+UI FEEDBACK FROM CHRIS
+
+✔ When running our test scans, the biggest challenge we had was knowing what was getting scanned and what was missed. We were using a computer that didn't have sound so auditory feedback would be helpful. @done(2018-07-31 21:47)
+
+✔ We need to be able to name scans reports because they may do more than one in the same day and it's hard to know which report to open when they all have the same name/date. @done(2018-07-23 00:16)
+
+✔ The scan log should Put the last frame scanned at the top of the list. @done(2018-07-22 12:43)
+
+✔ When removing a frame from the scan log it shouldn't automatically stop the scan process. It was easy to forget to click the start scanning button which created a lot of problems. Again an auditory feedback would be helpful. @done(2018-07-31 21:46)
+
+✔ When uploading a report it should automatically filter the items for frames and sunglasses, thereby removing accessories and contact lenses from the scan report. @done(2018-07-22 12:43)
+
+☐ It would be helpful to have better filtering and sorting of the inventory list. I found that the staff likes to scan a few sections at a time and only want to see three specific brands in the list etc.
