@@ -2,13 +2,73 @@ Trying to get everything ready to sell at Pearle trade show on April 28th
 
 ✔ Implement Andy's design (using tachyons instead of bootstrap -- optional) @done(2018-04-24 22:52)
 ☐ Make SCAN work on View Inventory screen
-☐ Change database structure to support mutliple Okta users per ORGANIZATION
-☐ Change login to look up Organization when logging in
+✔ Change database structure to support mutliple Okta users per ORGANIZATION @done(2018-07-19 23:46)
+✔ Change login to look up Organization when logging in @done(2018-07-19 23:46)
 ☐ Change sign up form to support Org+Users model
-☐ Upgrade Heroku account to minimal production level
+✔ Upgrade Heroku account to minimal production level @done(2018-06-18 22:38)
 ☐ Integrate with Stripe API to support subscription / sign up
 ☐ Use react-snapshot (or whatever works best) to get cached copies of certain pages for SEO
 ✔ Import `react-dropzone` and support dragging+dropping files to upload @done(2018-04-10 01:53)
 ✔ Create HOC to replace `dataAdapter/JsonApi` and simplify passing of token to API @done(2018-03-22 11:36)
 ✔ Build custom sign in form against Okta @done(2018-03-22 12:00)
 ✔ Build custom sign up form against Okta @done(2018-03-22 16:27)
+
+
+
+✔ Create a RTDB model for syncing report counts (with option for RT or OnceOnly fetch) @done(2018-06-18 00:14)
+✔ Add a method to the Inventory model that fetches the report model on request @done(2018-06-18 00:14)
+
+☐ Get Inventory Report page wired up to new data models
+✔  - top panels @done(2018-06-18 00:14)
+✔  - table grid @done(2018-06-18 00:14)
+
+✔ Create FS model for Scan Log @done(2018-06-19 23:25)
+
+ViewInventory.js
+LINE 337: const data = await api.getInventoryStylesDiff(inventoryId)
+✔ Change query to populate list for CopyDialog (where mimsQty = 0 and fifoQty > 0) @done(2018-06-18 22:39)
+
+TuposeFirestoreModel
+✔ Add `wheres` option to loadCollection static method @done(2018-06-18 22:39)
+
+✔ Calculation of Value sums is using int instead of float @done(2018-06-20 22:58)
+✔ Need to format values as dollars @done(2018-06-20 22:58)
+
+
+✔ Change Tupos model to support watchable collection with RT updates @done(2018-06-20 22:59)
+✔ Modify scan log page to allow RT updates on ScanLog list that shows up on page @done(2018-06-20 22:59)
+☐ Possibly limit scan log query to 500 most recent (or scans today? per day?)
+✔ Change cloud function for ScanLog to detect deletes and decrement fifoQty @done(2018-06-20 22:59)
+✔ Change Tupos model to support delete @done(2018-06-20 22:59)
+✔ Change ScanLog page to allow deletes @done(2018-06-20 22:59)
+
+
+✔ Clean up code on Scan view @done(2018-06-21 21:26)
+☐ Clean up UI on Scan view (make scan log look presentable)
+✔ Popups!! @done(2018-06-21 23:01)
+✔ Handle Scan of Invalid barcode by adding new product @done(2018-06-21 23:01)
+✔ Standardize logging of cloud functions for easy troubleshooting + readability + terseness (one line per invocation?) @done(2018-06-21 22:17)
+
+B E T A - R E A D Y
+✔ Move to FB Auth @done(2018-07-19 23:46)
+✔ Database Security Rules @done(2018-07-19 23:46)
+✔ Attach User to Org on Login @done(2018-07-19 23:46)
+
+☐ Locations still hardcoded (need to decide how to implement)
+☐ Need a org/user management interface (maybe, admins only)
+☐ Scan Log is locking up for some reason
+
+
+UI FEEDBACK FROM CHRIS
+
+✔ When running our test scans, the biggest challenge we had was knowing what was getting scanned and what was missed. We were using a computer that didn't have sound so auditory feedback would be helpful. @done(2018-07-31 21:47)
+
+✔ We need to be able to name scans reports because they may do more than one in the same day and it's hard to know which report to open when they all have the same name/date. @done(2018-07-23 00:16)
+
+✔ The scan log should Put the last frame scanned at the top of the list. @done(2018-07-22 12:43)
+
+✔ When removing a frame from the scan log it shouldn't automatically stop the scan process. It was easy to forget to click the start scanning button which created a lot of problems. Again an auditory feedback would be helpful. @done(2018-07-31 21:46)
+
+✔ When uploading a report it should automatically filter the items for frames and sunglasses, thereby removing accessories and contact lenses from the scan report. @done(2018-07-22 12:43)
+
+☐ It would be helpful to have better filtering and sorting of the inventory list. I found that the staff likes to scan a few sections at a time and only want to see three specific brands in the list etc.

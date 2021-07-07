@@ -10,7 +10,7 @@ class FrameDiffDialog extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      data: [],
+      data: false,
       copied: false,
     }
   }
@@ -40,29 +40,30 @@ class FrameDiffDialog extends Component {
       status,
       name,
       title,
+      showQty,
     } = this.props
 
-    const rowMapper = ({ upc, qty }) => (
+    const rowMapper = ({ upc, overUnder }) => (
       <li key={`${name}-row-${upc}`}>
         <div className="cf">
-          <div className={`pa3 ba b--moon-gray near-black fl ${qty ? 'w-70' : 'w-100'}`}>{upc}</div>
-          { qty && <div className="pa3 ba b--moon-gray near-black fl w-30">{qty}</div> }
+          <div className={`pa3 ba b--moon-gray near-black fl ${(overUnder && showQty) ? 'w-70' : 'w-100'}`}>{upc}</div>
+          { overUnder && showQty && <div className="pa3 ba b--moon-gray near-black fl w-30">{Math.abs(overUnder)}</div> }
         </div>
       </li>
     )
 
-    const textMapper = ({ upc, qty }) => {
+    const textMapper = ({ upc, overUnder }) => {
       let s = `${upc}`
-      if (qty) {
-        s = `${s}\t${qty}`
+      if (overUnder && showQty) {
+        s = `${s}\t${Math.abs(overUnder)}`
       }
       return s
     }
 
-    const rows = data.map(rowMapper)
-    const text = data.map(textMapper).join('\n')
+    const rows = Array.isArray(data) && data.map(rowMapper)
+    const text = Array.isArray(data) && data.map(textMapper).join('\n')
 
-    const hasQty = Array.isArray(data) && data.length > 0 && 'qty' in data[0]
+    const hasQty = showQty && Array.isArray(data) && data.length > 0 && 'overUnder' in data[0]
 
     return (
       isOpen
@@ -121,12 +122,14 @@ FrameDiffDialog.propTypes = {
   fetchData: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
+  showQty: PropTypes.bool,
 }
 
 FrameDiffDialog.defaultProps = {
   isOpen: false,
   onClose: null,
   status: 'over',
+  showQty: true,
 }
 
 export default FrameDiffDialog

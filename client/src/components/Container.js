@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 function Container({ children, wide }) {
   return (
-    <div className={`w-100 pt4 ${wide ? 'mw8' : 'mw7'} center`}>
+    <div className={`w-100 pt5 ${wide ? 'mw8' : 'mw7'} center`}>
       { children }
     </div>
   )

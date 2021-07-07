@@ -13,6 +13,7 @@ module.exports = {
           "error",
           "never"
       ],
+      "no-underscore-dangle": [ 0 ],
       "consistent-return": [ 0 ],
       "jsx-a11y/no-autofocus": [ 0 ],
       "jsx-a11y/anchor-is-valid": [ "error", {

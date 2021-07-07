@@ -6,7 +6,7 @@ import OverArrow from '../components/OverArrow'
 import UnderArrow from '../components/UnderArrow'
 
 function InventoryListItem({
-  id, timestamp, overCount, underCount,
+  id, timestamp, overCount, underCount, name,
 }) {
   const date = new Moment(timestamp)
 
@@ -17,8 +17,9 @@ function InventoryListItem({
       >
         <div className="flex items-center bb b--black-05 lh-copy pa3 ph0 ml4">
           <div className="flex-auto">
-            <h2 className="f3 fw3 db ma0 pa0 black">{date.format('dddd')}</h2>
-            <h3 className="f4 fw3 db gray ma0 pa0">{date.format('MMM D')}</h3>
+            { name && (<h2 className="f4 b db ma0 pa0 black">{name}</h2>)}
+            <h2 className="f4 fw3 db ma0 pa0 black">{date.format('dddd')}</h2>
+            <h3 className="f5 fw3 db gray ma0 pa0">{date.format('MMM D')}</h3>
           </div>
           <div className="w-20 tr f3 fw3 dark-gray items-center">
             {overCount}&nbsp;&nbsp;<OverArrow />
@@ -28,25 +29,16 @@ function InventoryListItem({
           </div>
         </div>
       </li>
-
-      {/* <ListGroupItem className="justify-content-between">
-        <button className="btn btn-sm btn-success">View</button>
-        {title}
-        <div>
-          <Badge pill color={overColor}>Over: {overCount}</Badge>
-          &nbsp;
-          <Badge pill color={underColor}>Under: {underCount}</Badge>
-        </div>
-      </ListGroupItem> */}
     </Link>
   )
 }
 
 InventoryListItem.propTypes = {
-  id: PropTypes.number,
-  timestamp: PropTypes.string,
+  id: PropTypes.string,
+  timestamp: PropTypes.number,
   overCount: PropTypes.number,
   underCount: PropTypes.number,
+  name: PropTypes.string,
 }
 
 InventoryListItem.defaultProps = {
@@ -54,6 +46,7 @@ InventoryListItem.defaultProps = {
   timestamp: null,
   overCount: 0,
   underCount: 0,
+  name: null,
 }
 
 export default InventoryListItem

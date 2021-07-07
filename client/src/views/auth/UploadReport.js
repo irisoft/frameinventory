@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import PropTypes from 'prop-types'
 import { Redirect, Link } from 'react-router-dom'
 import Dropzone from 'react-dropzone'
 import Spinner from 'react-spinkit'
@@ -10,6 +9,9 @@ import ExcelIcon from '../../assets/excel-dark.png'
 import RoundButton from '../../components/RoundButton'
 import UploadIcon from '../../assets/upload-icon.png'
 import FolderIcon from '../../assets/folder-open-dark.png'
+import InventoryCount from '../../dao/InventoryCount'
+import Inventory from '../../dao/Inventory'
+import withFirebase from '../../hocs/withFirebase'
 
 class UploadReport extends Component {
   constructor(props) {
@@ -34,36 +36,41 @@ class UploadReport extends Component {
   processFile = () => {
     this.setState({ processingFile: true }, () => {
       const { file } = this.state
-      const { api } = this.props
+      const { userProfile } = this.props
       const reader = new FileReader()
 
-      reader.onload = (loadEvent) => {
+      reader.onload = async (loadEvent) => {
         const data = loadEvent.target.result
 
         const workbook = XLSX.read(data, { type: 'binary' })
 
         const json = XLSX.utils.sheet_to_json(workbook.Sheets.Sheet1)
 
-        api.createNewInventory().then(async ({ id: inventoryId }) => {
-          const products = []
+        const inventory = new Inventory({
+          status: 'active',
+          locationId: `organizations/${userProfile.organizationId}/locations/Oea2rlsW1hnN3vUmOObU`,
+          startedAt: new Date(),
+        }, userProfile.organizationId)
 
-          json.forEach((row) => {
-            const product = {
-              upc: row['EAN/UPC'],
-              description: row['Material Description'],
-              brand: row['Product Brand'],
-              type: row['Product Type'],
-              salesPrices: row['Sales Price'],
-              sellinPrice: row['Sell-in Price'],
-              reportQty: parseInt(row.Quantity.toString(), 10),
-              manualQty: 0,
-            }
-            products.push(product)
-          })
+        const inventoryRef = await inventory.save()
 
-          await api.insertProducts(inventoryId, products)
-          this.setState({ readyToRedirect: true, inventoryId })
-        })
+        const products = json.filter((row) => {
+          const productType = ('Product Type' in row) && typeof row['Product Type'] === 'string'
+            ? row['Product Type'].toLowerCase()
+            : ''
+          return productType === 'frames'
+        }).map(row => new InventoryCount({
+          upc: row['EAN/UPC'],
+          description: row['Material Description'],
+          brand: row['Product Brand'],
+          type: row['Product Type'],
+          salesPrice: row['Sales Price'],
+          sellInPrice: row['Sell-in Price'],
+          mimsQty: row.Quantity,
+          fifoQty: 0,
+        }, userProfile.organizationId, inventoryRef.id))
+        await InventoryCount.saveBatch(products)
+        this.setState({ readyToRedirect: true, inventoryId: inventoryRef.id })
       }
 
       reader.readAsBinaryString(file)
@@ -171,12 +178,4 @@ class UploadReport extends Component {
   }
 }
 
-UploadReport.propTypes = {
-  api: PropTypes.shape({}),
-}
-
-UploadReport.defaultProps = {
-  api: null,
-}
-
-export default UploadReport
+export default withFirebase(UploadReport)

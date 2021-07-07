@@ -1,0 +1,15 @@
+{
+  "id":44308,
+  "inventory_id":59,
+  "product_id":44308,
+  "manual_qty":0,
+  "report_qty":0,
+  "upc":"094733100021",
+  "brand":"ToeWarmer",
+  "description":"toe warmer",
+  "sales_price":0.00,
+  "sell_in_price":0.00,
+  "type":"Warmer",
+  "organization_id":1,
+  "over_under":0
+}

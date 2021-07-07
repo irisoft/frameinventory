@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Route } from 'react-router-dom'
-import withAPI from '../../dataAdapters/withAPI'
 import ListInventories from './ListInventories'
 import ViewInventory from './ViewInventory'
 import Scan from './Scan'
@@ -37,4 +36,4 @@ AuthContainer.defaultProps = {
   authenticated: null,
 }
 
-export default withAPI(AuthContainer)
+export default AuthContainer
